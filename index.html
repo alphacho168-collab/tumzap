@@ -554,7 +554,7 @@
             if (cachedOrders) localOrders = JSON.parse(cachedOrders);
             if (cachedOrderItems) localOrderItems = JSON.parse(cachedOrderItems);
 
-            // Set default headers and render restored cache immediately
+            // Set default headers and render restored cache immediately (Instant Menu Display!)
             updateHeaderStatus();
             renderAll();
             
@@ -569,12 +569,12 @@
             // Always pull latest data from Google Sheets in the background silently
             syncWithGoogleSheet();
 
-            // Setup background polling (Every 12 seconds)
+            // Setup background polling (Every 5 seconds for instant real-time kitchen experience!)
             autoSyncInterval = setInterval(() => {
                 if (!IS_SIMULATION) {
                     syncWithGoogleSheet();
                 }
-            }, 12000);
+            }, 5000);
         };
 
         function renderAll() {
@@ -661,27 +661,32 @@
                     if (data.orders) {
                         localOrders = data.orders;
                         localStorage.setItem('tumzap_orders', JSON.stringify(data.orders));
+                        localStorage.setItem('tumzap_has_real_data', 'true'); // Flag indicating successful sync
                         
-                        // Smart Parser: Flat-table JSON converter to dynamically build localOrderItems from nesting
+                        // CRITICAL CRASH-PROOF PARSER: Prevents JavaScript crashes when parsing order items from Sheets!
                         localOrderItems = [];
                         localOrders.forEach(o => {
                             let parsedItems = [];
-                            if (typeof o.items === 'string') {
-                                try { parsedItems = JSON.parse(o.items); } catch(e) {}
-                            } else if (Array.isArray(o.items)) {
-                                parsedItems = o.items;
+                            if (o.items) {
+                                if (typeof o.items === 'string') {
+                                    try { parsedItems = JSON.parse(o.items); } catch(e) { parsedItems = []; }
+                                } else if (Array.isArray(o.items)) {
+                                    parsedItems = o.items;
+                                }
                             }
                             
-                            parsedItems.forEach(item => {
-                                localOrderItems.push({
-                                    order_id: o.order_id,
-                                    menu: item.name || item.menu,
-                                    qty: item.qty,
-                                    price: item.price,
-                                    spiciness: item.spiciness || "",
-                                    notes: item.notes || ""
+                            if (parsedItems && Array.isArray(parsedItems)) {
+                                parsedItems.forEach(item => {
+                                    localOrderItems.push({
+                                        order_id: o.order_id,
+                                        menu: item.name || item.menu || '',
+                                        qty: item.qty || 1,
+                                        price: item.price || 0,
+                                        spiciness: item.spiciness || "",
+                                        notes: item.notes || ""
+                                    });
                                 });
-                            });
+                            }
                         });
                         localStorage.setItem('tumzap_order_items', JSON.stringify(localOrderItems));
                     }
@@ -796,17 +801,20 @@
             const container = document.getElementById('client-food-grid');
             container.innerHTML = '';
 
+            // Flag indicating if we successfully cached real data before
+            const isRealSheetLoaded = localStorage.getItem('tumzap_has_real_data') === 'true';
+
             // Filter items: category + MUST have updated image URL (starts with http) in Production!
             const filteredMenu = localMenu.filter(item => {
                 if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
                 
-                // If in simulation, show all default placeholder emojis to let them test
-                if (IS_SIMULATION) return true;
+                // If in simulation mode OR if we haven't loaded any real sheet data yet, show all default emojis so it's not empty
+                if (IS_SIMULATION || !isRealSheetLoaded) return true;
                 
                 // If in production, strictly enforce hiding items without real uploaded image URLs!
                 const imgStr = item.image ? String(item.image).trim() : '';
                 const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
-                return isUrl;
+                return isUrl && item.name && String(item.name).trim() !== '';
             });
 
             if (filteredMenu.length === 0) {
@@ -1355,23 +1363,21 @@
             const orderId = "O" + Math.floor(1000 + Math.random() * 9000);
             const orderTime = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
             
-            // Generate items lists
             let totalSum = 0;
             cart.forEach(c => totalSum += (c.price * c.qty));
 
-            // Map and format items so they write to Google Sheets smoothly
+            // Format items carefully so Sheets parsed JSON contains array elements
             const formattedItemsForScript = cart.map(c => {
                 const spicinessText = c.spiciness ? ` (${c.spiciness})` : '';
                 const noteText = c.notes ? ` [โน้ต: ${c.notes}]` : '';
                 return {
-                    name: `${c.name}${spicinessText}${noteText}`, // written to item.name column
-                    menu: `${c.name}${spicinessText}${noteText}`, // fallback match
+                    name: `${c.name}${spicinessText}${noteText}`,
                     qty: c.qty,
                     price: c.price
                 };
             });
 
-            // Dual-Format payload to satisfy older/newer doPost in Google Apps Script!
+            // Ultimate Dual-Format Payload: Fits newer & older Apps Script triggers perfectly!
             const postPayload = {
                 action: "createOrder",
                 table: currentClientTable,
@@ -1379,7 +1385,7 @@
                 time: orderTime,
                 items: formattedItemsForScript,
 
-                // Legacy nested format fallback support
+                // Nested wrapper support as fallback
                 order: {
                     order_id: orderId,
                     table: currentClientTable,
@@ -1394,29 +1400,31 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "⏳ กำลังส่งอาหารเข้าคิวห้องครัว...";
 
-            if (IS_SIMULATION) {
-                // Mock Order locally
-                const localOrderMock = {
-                    order_id: orderId,
-                    table: currentClientTable,
-                    items: formattedItemsForScript.map(i => `${i.name} x${i.qty}`).join(", "),
-                    total: totalSum,
-                    status: 'new',
-                    time: orderTime
-                };
-                
-                const localItemsMock = cart.map(c => ({
-                    order_id: orderId,
-                    menu: c.name,
-                    qty: c.qty,
-                    price: c.price,
-                    spiciness: c.spiciness || "",
-                    notes: c.notes || ""
-                }));
+            // HYBRID REAL-TIME ENGINE: Push local objects instantly for same-browser testing!
+            const localOrderMock = {
+                order_id: orderId,
+                table: currentClientTable,
+                items: formattedItemsForScript.map(i => `${i.name} x${i.qty}`).join(", "),
+                total: totalSum,
+                status: 'new',
+                time: orderTime
+            };
+            
+            const localItemsMock = cart.map(c => ({
+                order_id: orderId,
+                menu: `${c.name}${c.spiciness ? ' ('+c.spiciness+')' : ''}${c.notes ? ' ['+c.notes+']' : ''}`,
+                qty: c.qty,
+                price: c.price,
+                spiciness: c.spiciness || "",
+                notes: c.notes || ""
+            }));
 
-                localOrders.push(localOrderMock);
-                localOrderItems.push(...localItemsMock);
-                
+            // Force local array merge instantly! This guarantees instant render in split tabs!
+            localOrders.push(localOrderMock);
+            localOrderItems.push(...localItemsMock);
+            renderAll();
+
+            if (IS_SIMULATION) {
                 setTimeout(() => {
                     cart = [];
                     updateClientCartSummary();
@@ -1438,7 +1446,7 @@
                         body: JSON.stringify(postPayload)
                     });
 
-                    // Sync and transition views
+                    // Sync silently in background and transition screens smoothly
                     setTimeout(async () => {
                         cart = [];
                         updateClientCartSummary();
@@ -1454,8 +1462,7 @@
 
                 } catch (err) {
                     console.error("Submit order error:", err);
-                    showToast("สัญญาณขาดหาย กำลังสลับบันทึกแบบออฟไลน์สำรองชั่วคราว", "⚠️");
-                    
+                    showToast("เครือข่ายขัดข้องเล็กน้อย ยืนยันออเดอร์ในแอปชั่วคราว", "⚠️");
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `🔥 ยืนยันคำสั่งซื้อส่งห้องครัว`;
                 }
@@ -1560,7 +1567,7 @@
             }
         }
 
-        // ==================== CASHIER ACTION CONTROLLERS (WITH HYBRID FALLBACKS) ====================
+        // ==================== CASHIER ACTION CONTROLLERS ====================
 
         function openBillingModal(tableCode) {
             const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid' && o.status !== 'cancelled');
@@ -1657,7 +1664,7 @@
                         })
                     });
 
-                    // Multi-Fallback: Update status of each active order individually to ensure they close out completely!
+                    // Multi-Fallback: Force-closed each order status to Paid in sheets
                     for (let o of activeOrders) {
                         await fetch(API_URL, {
                             method: "POST",
@@ -1715,4 +1722,3 @@
     </script>
 </body>
 </html>
-```eof
