@@ -7,52 +7,96 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4">
-    <div id="app" class="max-w-md mx-auto bg-white p-4 rounded-2xl shadow-lg">
+    <div id="app" class="max-w-md mx-auto bg-white p-4 rounded-2xl shadow-lg min-h-screen">
         <h1 class="text-2xl font-bold text-center text-orange-600 mb-4">ตำแซ่บ ซ.4</h1>
-        <div id="status" class="text-center text-gray-500 italic">กำลังโหลดเมนู...</div>
-        <div id="menu-container" class="grid grid-cols-2 gap-4"></div>
+        <div id="status" class="text-center text-gray-500 italic">กำลังเชื่อมต่อข้อมูล...</div>
+        <div id="menu-grid" class="grid grid-cols-2 gap-4"></div>
+        
+        <div class="fixed bottom-4 left-4 right-4 max-w-md mx-auto">
+            <button onclick="openCart()" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold shadow-xl">🛒 ตรวจสอบตะกร้า</button>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end">
+        <div class="bg-white w-full p-6 rounded-t-3xl max-h-screen overflow-y-auto">
+            <h2 class="font-bold text-lg mb-4">รายการอาหาร</h2>
+            <div id="cart-content"></div>
+            <button id="send-btn" onclick="sendOrder()" class="w-full bg-orange-600 text-white p-4 rounded-xl font-bold mt-4">ยืนยันสั่งซื้อ</button>
+            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full text-gray-400 p-2 mt-2">ปิด</button>
+        </div>
     </div>
 
     <script>
-        // ใส่ URL Apps Script ของคุณที่นี่ (ตรวจสอบให้แน่ใจว่าลงท้ายด้วย /exec)
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
+        let cart = [];
+        let menuCache = [];
 
-        async function loadMenu() {
+        async function init() {
             try {
-                const response = await fetch(API_URL + "?action=getInitialData");
-                const data = await response.json();
-                
-                if (data && data.menu) {
-                    document.getElementById('status').style.display = 'none';
-                    const container = document.getElementById('menu-container');
-                    container.innerHTML = data.menu.map(item => `
-                        <div class="border p-2 rounded-xl text-center">
-                            <div class="text-2xl mb-2">${item.image || '🥗'}</div>
-                            <h3 class="font-bold text-sm truncate">${item.name}</h3>
-                            <p class="text-orange-600 font-bold">฿${item.price}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    document.getElementById('status').innerText = "ไม่พบข้อมูลเมนูในระบบ";
-                }
-            } catch (error) {
-                document.getElementById('status').innerText = "เชื่อมต่อระบบไม่ได้: " + error.message;
-            }
+                const res = await fetch(API_URL + "?action=getInitialData");
+                const data = await res.json();
+                menuCache = data.menu;
+                renderMenu();
+            } catch(e) { document.getElementById('status').innerText = "เชื่อมต่อฐานข้อมูลล้มเหลว"; }
         }
-        
-        // เริ่มทำงาน
-        loadMenu();
+
+        function renderMenu() {
+            const container = document.getElementById('menu-grid');
+            document.getElementById('status').style.display = 'none';
+            container.innerHTML = menuCache.map(item => `
+                <div class="border p-2 rounded-xl text-center">
+                    <div class="h-20 flex items-center justify-center overflow-hidden mb-2">
+                        ${(item.image && item.image.startsWith('http')) ? `<img src="${item.image}" class="w-full h-full object-cover rounded-lg">` : `<span class="text-3xl">${item.image || '🥗'}</span>`}
+                    </div>
+                    <h3 class="font-bold text-sm truncate">${item.name}</h3>
+                    <p class="text-orange-600 font-bold text-xs">฿${item.price}</p>
+                    <button onclick="addToCart('${item.name}', ${item.price})" class="bg-black text-white w-full py-1 rounded-lg mt-2 text-xs font-bold">+ สั่งเลย</button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(name, price) {
+            cart.push({name, price});
+            alert(name + " เพิ่มลงตะกร้าแล้ว");
+        }
+
+        function openCart() {
+            document.getElementById('cart-content').innerHTML = cart.map(i => `<div class="flex justify-between py-2 border-b"><span>${i.name}</span><span>฿${i.price}</span></div>`).join('');
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        async function sendOrder() {
+            const btn = document.getElementById('send-btn');
+            btn.innerText = "กำลังส่ง...";
+            btn.disabled = true;
+
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        action: "createOrder",
+                        table: "A01",
+                        totalPrice: cart.reduce((a, b) => a + b.price, 0),
+                        time: new Date().toLocaleTimeString(),
+                        items: cart.map(i => ({ name: i.name, qty: 1, price: i.price }))
+                    })
+                });
+                alert("✅ ส่งออเดอร์สำเร็จ!");
+                cart = [];
+                document.getElementById('modal').classList.add('hidden');
+            } catch(e) { alert("เชื่อมต่อพลาด"); } finally { btn.innerText = "ยืนยันสั่งซื้อ"; btn.disabled = false; }
+        }
+        init();
     </script>
 </body>
 </html>
+```eof
 
+### ⚠️ ขั้นตอนตรวจสอบหลังอัปเดต:
+1. **เคลียร์แคช:** กด `Ctrl + F5` ที่หน้าเว็บร้านค้าของคุณ เพื่อดูรูปภาพใหม่
+2. **ลิงก์รูป:** หากรูปยังไม่ขึ้น หรือยังเป็นลิงก์ข้อความ แสดงว่าลิงก์ในชีตของคุณยังไม่ใช่ **Direct Link ([https://i.ibb.co/](https://i.ibb.co/)...)** ให้แก้ในชีตให้ถูกต้องตามนี้ครับ
+3. **ตรวจสอบ Sheet:** ข้อมูลจะไปเด้งในชีต `ORDERS` ทันทีที่สั่งครับ
 
-### 3. ตรวจสอบสถานะ Google Sheets
-หากทำตามข้อ 1 และ 2 แล้ว ยังไม่โชว์เมนู:
-1. ให้คุณเปิดหน้า **Google Apps Script** (ที่เดียวกับที่คุณกด Deploy)
-2. ดูตรงเมนู **"การทำงาน (Executions)"** ด้านซ้ายมือ
-3. ดูว่ามีการ **"เรียกใช้ (Execution)"** ที่ขึ้นสถานะสีแดง (Failed) หรือไม่?
-   * ถ้ามี ให้คลิกดูที่รายการนั้น แล้วดู **ข้อความแสดงข้อผิดพลาด (Error Message)**
-   * **ขอให้คุณคัดลอก Error นั้นส่งมาให้ผมครับ** ผมจะวิเคราะห์จาก Error จริงๆ ว่ามันติดตรงไหนครับ
-
-คุณ Get Patradit ครับ ผมไม่ได้หายไปไหน และจะช่วยคุณจนกว่าร้านจะเปิดได้สำเร็จครับ ส่ง Error ที่พบในหน้า Executions มาให้ผมได้เลยครับ!
+ผมคอยดูแลคุณ Get Patradit อยู่ตรงนี้ครับ หากทำตามนี้แล้วยังมีข้อผิดพลาด แจ้งผมได้เลยครับ!
