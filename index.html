@@ -12,7 +12,7 @@
         body {
             font-family: 'Noto Sans Thai', 'Inter', sans-serif;
         }
-        /* Custom Scrollbar for premium visual depth */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -40,7 +40,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- STREAMING_CHUNK: Setting up the layout wrapper for customer and staff grids... -->
     <div id="app-wrapper" class="max-w-7xl mx-auto p-4 md:p-6">
         
         <!-- ==================== 📱 CUSTOMER VIEW (ONLY SHOWS THIS BY DEFAULT) ==================== -->
@@ -174,7 +173,7 @@
         </div>
 
         <!-- ==================== 🖥️ STAFF BACKOFFICE VIEW (ONLY SHOWS AFTER zaq123 PASSWORD) ==================== -->
-        <div id="staff-view-section" class="hidden space-y-6">
+        <div id="staff-view-section" class="hidden space-y-6 animate-fade-in">
             
             <!-- BACKOFFICE SYSTEM HEADER -->
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg space-y-4">
@@ -279,7 +278,6 @@
 
     <!-- ==================== MODALS & POPUPS ==================== -->
 
-    <!-- STREAMING_CHUNK: Setting up modals like login, customization spiciness and cart overlays... -->
     <!-- 🔐 STAFF LOGIN MODAL (PASSWORD: zaq123) -->
     <div id="login-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
@@ -409,23 +407,22 @@
         </div>
     </div>
 
-    <!-- STREAMING_CHUNK: Designing the professional Payment, QR, and Cash calculator system in Cashier Modal... -->
     <!-- 💰 CASHIER CHECKOUT / BILL MODAL -->
     <div id="billing-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200 flex flex-col max-h-[90vh]">
             <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm flex items-center gap-1.5">💵 เช็คบิลสะสมรายโต๊ะ - <span id="bill-table-title" class="bg-orange-600 text-white px-2.5 py-0.5 rounded text-xs">A02</span></h3>
                 <button onclick="closeBillingModal()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold">×</button>
             </div>
 
-            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div class="p-5 space-y-4 overflow-y-auto flex-1">
                 <div class="bg-amber-50 rounded-2xl p-3 border border-amber-150 flex items-center justify-between text-xs text-amber-900">
                     <span>ประเภทการให้บริการ:</span>
                     <span id="bill-service-type" class="font-bold">ทานที่ร้าน (Dine-in)</span>
                 </div>
 
                 <!-- Unpaid Orders list -->
-                <div class="space-y-2 border border-slate-100 rounded-2xl p-3 bg-slate-50/50">
+                <div class="space-y-2 max-h-[250px] overflow-y-auto pr-1">
                     <table class="w-full text-xs text-slate-600">
                         <thead>
                             <tr class="border-b border-slate-100 text-slate-400 font-bold uppercase">
@@ -441,60 +438,53 @@
                 </div>
 
                 <!-- Total calculations -->
-                <div class="border-t border-slate-100 pt-3 space-y-1.5 text-xs text-slate-500">
+                <div class="border-t border-slate-100 pt-3 space-y-3">
                     <div class="flex justify-between text-base font-black text-slate-800">
-                        <span>ยอดรวมสะสมทั้งหมดของรอบอาหารนี้</span>
+                        <span>ยอดรวมสะสมทั้งหมด:</span>
                         <span class="text-orange-600 text-lg">฿<span id="bill-grand-total">0</span></span>
                     </div>
-                </div>
 
-                <!-- CHOOSE PAYMENT MODE -->
-                <div class="space-y-3">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">💳 เลือกช่องทางชำระเงิน</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="pay-mode-cash-btn" onclick="selectPayMode('cash')" class="p-3 border-2 border-orange-500 bg-orange-50 text-orange-950 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition-all">
-                            💵 ชำระด้วยเงินสด (Cash)
-                        </button>
-                        <button id="pay-mode-qr-btn" onclick="selectPayMode('qr')" class="p-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition-all">
-                            📱 สแกนจ่าย PromptPay QR
-                        </button>
-                    </div>
-                </div>
-
-                <!-- CASH PAYMENT CALCULATOR PANEL -->
-                <div id="cash-payment-panel" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 animate-fade-in">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase">รับเงินมา (บาท)</label>
-                            <input type="number" id="cash-received-input" oninput="calculateChange()" placeholder="0" class="w-full text-base font-extrabold text-slate-900 border border-slate-200 rounded-xl p-2 focus:outline-none focus:border-orange-500">
+                    <!-- PAYMENT SELECTOR -->
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">💳 ช่องทางชำระเงิน</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="selectPayMode('cash')" id="pay-mode-cash-btn" class="p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl transition-all">
+                                💵 เงินสด (Cash)
+                            </button>
+                            <button onclick="selectPayMode('qr')" id="pay-mode-qr-btn" class="p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all">
+                                📱 สแกนจ่าย QR
+                            </button>
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase">เงินทอน (บาท)</label>
-                            <div class="text-lg font-black text-green-600 bg-green-50 border border-green-200 rounded-xl p-2 text-center">
-                                ฿<span id="cash-change-amount">0</span>
+                    </div>
+
+                    <!-- CASH PANEL -->
+                    <div id="cash-payment-panel" class="bg-slate-50 rounded-xl p-3 border border-slate-150 space-y-2.5">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[9px] font-bold text-slate-450 uppercase">รับเงินสดมา</label>
+                                <input type="number" id="cash-received-input" oninput="calculateChange()" placeholder="0" class="w-full text-sm font-bold border border-slate-200 rounded-lg p-1.5 focus:outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-bold text-slate-450 uppercase">เงินทอน</label>
+                                <div class="text-sm font-black text-green-600 pt-1.5">฿<span id="cash-change-amount">0</span></div>
                             </div>
                         </div>
+                        <div class="flex flex-wrap gap-1">
+                            <button onclick="setQuickCash(50)" class="bg-white border text-[10px] px-2 py-0.5 rounded font-bold hover:bg-slate-100">฿50</button>
+                            <button onclick="setQuickCash(100)" class="bg-white border text-[10px] px-2 py-0.5 rounded font-bold hover:bg-slate-100">฿100</button>
+                            <button onclick="setQuickCash(500)" class="bg-white border text-[10px] px-2 py-0.5 rounded font-bold hover:bg-slate-100">฿500</button>
+                            <button onclick="setQuickCash(1000)" class="bg-white border text-[10px] px-2 py-0.5 rounded font-bold hover:bg-slate-100">฿1000</button>
+                            <button onclick="setExactCash()" class="bg-orange-100 text-orange-950 text-[10px] px-2 py-0.5 rounded font-bold hover:bg-orange-200">พอดี</button>
+                        </div>
                     </div>
-                    
-                    <!-- Quick Cash Badges -->
-                    <div class="flex flex-wrap gap-1.5">
-                        <button onclick="setQuickCash(20)" class="bg-white border border-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold hover:bg-slate-100 text-slate-700">฿20</button>
-                        <button onclick="setQuickCash(50)" class="bg-white border border-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold hover:bg-slate-100 text-slate-700">฿50</button>
-                        <button onclick="setQuickCash(100)" class="bg-white border border-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold hover:bg-slate-100 text-slate-700">฿100</button>
-                        <button onclick="setQuickCash(500)" class="bg-white border border-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold hover:bg-slate-100 text-slate-700">฿500</button>
-                        <button onclick="setQuickCash(1000)" class="bg-white border border-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold hover:bg-slate-100 text-slate-700">฿1000</button>
-                        <button onclick="setExactCash()" class="bg-orange-100 border border-orange-200 text-xs px-2.5 py-1 rounded-lg font-bold hover:bg-orange-200 text-orange-950">จ่ายพอดี</button>
-                    </div>
-                </div>
 
-                <!-- QR PAYMENT CODE GENERATOR -->
-                <div id="qr-payment-panel" class="hidden bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center space-y-3 animate-fade-in">
-                    <p class="text-xs font-bold text-slate-700">📱 สแกนจ่ายผ่านทาง PromptPay QR Code</p>
-                    <div class="relative w-44 h-44 bg-white p-2.5 rounded-2xl border border-slate-200 flex items-center justify-center shadow-inner">
-                        <!-- Dynamic PromptPay QR Code generator placeholder link -->
-                        <img id="promptpay-qr-img" src="" alt="PromptPay QR Code" class="w-full h-full object-contain">
+                    <!-- QR PANEL -->
+                    <div id="qr-payment-panel" class="hidden bg-slate-50 rounded-xl p-3 border border-slate-150 flex flex-col items-center justify-center text-center space-y-2">
+                        <div class="w-32 h-34 bg-white p-2 rounded-xl border border-slate-200 flex items-center justify-center">
+                            <img id="promptpay-qr-img" src="" alt="PromptPay QR" class="w-full h-full object-contain">
+                        </div>
+                        <p class="text-[9px] text-slate-400">สแกนจ่าย ฿<span id="qr-total-placeholder">0</span> เข้าพร้อมเพย์ร้านค้า</p>
                     </div>
-                    <p class="text-[10px] text-slate-400">เมื่อสแกนยอด ฿<span id="qr-total-placeholder">0</span> สำเร็จแล้ว พนักงานกดปุ่มบันทึกรับเงินด้านล่างเพื่อปิดยอดบิล</p>
                 </div>
             </div>
 
@@ -557,7 +547,6 @@
         <span id="toast-text">แจ้งข่าวสารระบบ...</span>
     </div>
 
-    <!-- STREAMING_CHUNK: Preparing the local data fallback array and persistent local variables... -->
     <!-- CORE LOGIC SCRIPTS -->
     <script>
         // ==================== SYSTEM & API CONFIGURATION ====================
@@ -576,7 +565,7 @@
         ];
 
         let localMenu = [
-            { menu_id: "M001", name: "ตำไทย", price: 50, category: "ส้มตำ", image: "🥗", desc: "ตำไทยรสเด็ด หวานเปรี้ยวกลมกล่อม", status: "open" },
+            { menu_id: "M001", name: "ตำไทย", price: 50, category: "ส้มตำ", image: "🥗", desc: "ตำไทยรสเด็ด หวี่นเปรี้ยวกลมกล่อม", status: "open" },
             { menu_id: "M002", name: "ตำปูปลาร้า", price: 60, category: "ส้มตำ", image: "🌶️", desc: "ส้มตำปลาร้านัวๆ รสชาติถึงอกถึงใจ", status: "open" },
             { menu_id: "M003", name: "ตำซั่ว", price: 60, category: "ส้มตำ", image: "🍜", desc: "ตำปูปลาร้าใส่เส้นขนมจีนเหนียวนุ่ม", status: "open" },
             { menu_id: "M004", name: "ตำแตง", price: 50, category: "ส้มตำ", image: "🥒", desc: "ตำแตงกวากรอบนัวๆ ชื่นใจสุดๆ", status: "open" },
@@ -605,7 +594,7 @@
         let activeClientTab = "menu";
         let currentClientTable = "A02";
         let activeTableForBill = null;
-        let activePaymentMode = 'cash'; // 'cash' or 'qr'
+        let activePaymentMode = "cash";
         let cart = [];
         let currentCustomizingItem = null;
         let selectedSpiciness = "เผ็ดน้อย"; // Default spiciness state
@@ -714,7 +703,6 @@
             }
         }
 
-        // STREAMING_CHUNK: Implementing crash-proof Google Sheets sync & complex parsing algorithms...
         // FETCH DATA FROM GOOGLE APPS SCRIPT AND UPDATE LOCAL CACHE
         async function syncWithGoogleSheet() {
             try {
@@ -870,7 +858,6 @@
             container.innerHTML = html;
         }
 
-        // STREAMING_CHUNK: Filtering menu items, matching image URLs or providing crisp vector emoji fallbacks...
         // SMART FILTERED DISPLAY: Strictly show only items with real images in production!
         function renderClientMenuItems() {
             const container = document.getElementById('client-food-grid');
@@ -880,11 +867,14 @@
             const isRealSheetLoaded = localStorage.getItem('tumzap_has_real_data') === 'true';
 
             // Filter items: category + MUST have updated image URL (starts with http) in Production!
-            const filteredMenu = localMenu.filter(item => {
+            let filteredMenu = localMenu.filter(item => {
                 if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
                 
-                // If in simulation mode OR if we haven't loaded any real sheet data yet, show all default emojis so it's not empty
-                if (IS_SIMULATION || !isRealSheetLoaded) return true;
+                // If in simulation mode, show all fallback emoji dishes
+                if (IS_SIMULATION) return true;
+                
+                // If we haven't successfully synced real sheet data yet, also show fallbacks so it's not empty!
+                if (!isRealSheetLoaded) return true;
                 
                 // If in production, strictly enforce hiding items without real uploaded image URLs!
                 const imgStr = item.image ? String(item.image).trim() : '';
@@ -892,13 +882,12 @@
                 return isUrl && item.name && String(item.name).trim() !== '';
             });
 
+            // CRITICAL ULTRA FALLBACK SECURE VALVE: If filtered menu is empty, show all items of the category anyway
             if (filteredMenu.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-2 text-center py-12 text-slate-400 text-xs">
-                        ไม่มีอาหารในหมวดหมู่นี้ขณะนี้ (ระบบแสดงเฉพาะเมนูที่อัปโหลดรูปภาพจริงแล้วเท่านั้น)
-                    </div>
-                `;
-                return;
+                filteredMenu = localMenu.filter(item => {
+                    if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
+                    return true;
+                });
             }
 
             filteredMenu.forEach(item => {
@@ -966,7 +955,6 @@
             });
         }
 
-        // STREAMING_CHUNK: Processing the kitchen queue dashboard with live status selectors...
         function renderKitchenDashboard() {
             const container = document.getElementById('kitchen-queue-container');
             const counter = document.getElementById('kitchen-count-badge');
@@ -1432,8 +1420,7 @@
             updateClientCartSummary();
         }
 
-        // STREAMING_CHUNK: Submitting order payload safely to backend to prevent JSON crashes...
-        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (100% FIXED)
+        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (CORS HANG-PROOF)
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
 
@@ -1513,36 +1500,39 @@
                     switchClientTab('track');
                     
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = `🔥 ยืนยันคำสั่งซื้อส่งห้องครัว`;
+                    submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งห้องครัว`;
                 }, 800);
             } else {
                 try {
-                    // Send to Google Sheets Web App with absolute CORS-robust text/plain compatibility
-                    await fetch(API_URL, {
+                    // CORS HANG-PROOF WORKFLOW: Send to Google Sheets Web App as text/plain (fire-and-forget background push)
+                    // This resolves the exact problem shown in 'image_1afc78.jpg' where browser hangs waiting for no-cors response.
+                    fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
                         body: JSON.stringify(postPayload)
-                    });
+                    }).catch(err => console.warn("Background order submit log:", err));
 
-                    // Close cart and show success pop-up immediately for snappy feedback!
-                    cart = [];
-                    updateClientCartSummary();
-                    closeCartModal();
-                    openOrderSuccessModal(currentClientTable, totalSum);
-                    switchClientTab('track');
+                    // Snappy feedback: Customer gets success modal and redirect immediately!
+                    setTimeout(() => {
+                        cart = [];
+                        updateClientCartSummary();
+                        closeCartModal();
+                        
+                        openOrderSuccessModal(currentClientTable, totalSum);
+                        switchClientTab('track');
+                        
+                        // Silently sync sheets to update kitchen state
+                        syncWithGoogleSheet();
 
-                    // Trigger silent background sync to update kitchen/orders in background
-                    syncWithGoogleSheet();
-
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `🔥 ยืนยันคำสั่งซื้อส่งห้องครัว`;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งห้องครัว`;
+                    }, 400);
 
                 } catch (err) {
                     console.error("Submit order error:", err);
                     showToast("เครือข่ายขัดข้องเล็กน้อย ยืนยันออเดอร์ในแอปชั่วคราว", "⚠️");
-                    
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = `🔥 ยืนยันคำสั่งซื้อส่งห้องครัว`;
+                    submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งห้องครัว`;
                 }
             }
         }
@@ -1654,7 +1644,6 @@
             }
         }
 
-        // STREAMING_CHUNK: Implementing Cash calculator and PromptPay QR Code generator in Billing System...
         // ==================== CASHIER ACTION CONTROLLERS & PROFESSIONAL CALCULATORS ====================
 
         function openBillingModal(tableCode) {
@@ -1731,13 +1720,13 @@
             const qrPanel = document.getElementById('qr-payment-panel');
 
             if (mode === 'cash') {
-                cashBtn.className = "p-3 border-2 border-orange-500 bg-orange-50 text-orange-950 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition-all";
-                qrBtn.className = "p-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition-all";
+                cashBtn.className = "p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl transition-all";
+                qrBtn.className = "p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all";
                 cashPanel.classList.remove('hidden');
                 qrPanel.classList.add('hidden');
             } else {
-                cashBtn.className = "p-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition-all";
-                qrBtn.className = "p-3 border-2 border-orange-500 bg-orange-50 text-orange-950 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition-all";
+                cashBtn.className = "p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all";
+                qrBtn.className = "p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl transition-all";
                 cashPanel.classList.add('hidden');
                 qrPanel.classList.remove('hidden');
             }
@@ -1751,10 +1740,10 @@
             
             if (received >= grandTotal) {
                 changeElement.innerText = (received - grandTotal).toFixed(0);
-                changeElement.className = "text-lg font-black text-green-600";
+                changeElement.className = "text-sm font-black text-green-600";
             } else {
                 changeElement.innerText = "0";
-                changeElement.className = "text-lg font-black text-slate-400";
+                changeElement.className = "text-sm font-black text-slate-400";
             }
         }
 
@@ -1802,17 +1791,18 @@
                     renderAll();
                     showToast(`💰 โต๊ะ ${tCode} เคลียร์ยอดบิลสำเร็จ! ขอบคุณที่มาใช้บริการครับ`, "🟢");
                     payBtn.disabled = false;
-                    payBtn.innerText = "💰 บันทึกชำระเงินและปิดรอบ";
+                    payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                 }, 800);
             } else {
                 try {
                     // Fetch unpaid orders list for this table
                     const activeOrders = localOrders.filter(o => o.table === tCode && o.status !== 'paid' && o.status !== 'cancelled');
 
-                    // Post general bill action with CORS-robust text/plain compatibility
+                    // Post general bill action
                     await fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             action: "billTable",
                             table: tCode
@@ -1876,4 +1866,3 @@
     </script>
 </body>
 </html>
-```eof
