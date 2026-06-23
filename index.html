@@ -12,7 +12,7 @@
         body {
             font-family: 'Noto Sans Thai', 'Inter', sans-serif;
         }
-        /* Custom Scrollbar for modern feel */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -27,7 +27,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        /* Shake animation for alerts */
+        /* Shake animation for notes / urgent requests */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -40,57 +40,30 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- CONFIGURATION PANEL (HIDDEN IN PRODUCTION FOR CLIENTS, ACCESSIBLE FOR OPERATORS) -->
-    <div id="system-header" class="bg-white border-b border-slate-100 shadow-xs py-3 px-4 md:px-8">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="relative w-16 h-16 rounded-full overflow-hidden border-2 border-orange-500 shadow-sm flex items-center justify-center bg-orange-50">
-                    <!-- Real Logo with robust fallback -->
-                    <img id="logo-img" src="ChatGPT Image 23 มิ.ย. 2569 12_32_09.png" alt="ตำแซ่บ ซ.4" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
-                    <div id="logo-fallback" class="hidden absolute inset-0 items-center justify-center text-3xl">🌶️</div>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                        ตำแซ่บ ซ.4 <span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-semibold">ระบบจริง (Active)</span>
-                    </h1>
-                    <p class="text-xs text-slate-500">ระบบสั่งอาหาร ไร้กระดาษ เชื่อมต่อตรงกับ Google Sheets</p>
-                </div>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-2">
-                <div class="flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-green-200">
-                    <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
-                    เชื่อมต่อฐานข้อมูล Google Sheets
-                </div>
-                <button onclick="toggleViewMode()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
-                    🔄 สลับโหมดจำลอง / ใช้งานจริง
-                </button>
-                <button onclick="manualSync()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
-                    ⚡ ดึงข้อมูลล่าสุดจาก Google Sheets
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- MAIN GRID CONTAINER -->
     <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- ==================== LEFT COLUMN: CUSTOMER WEB APP (LIFF VIEW) ==================== -->
-        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-100 shadow-md overflow-hidden flex flex-col h-[780px] relative">
+        <!-- This column represents the client view. Scaled cleanly, it starts directly with the orange header! -->
+        <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col h-[800px] relative">
             
-            <!-- CLIENT TOP HEADER -->
-            <div class="bg-gradient-to-r from-orange-500 to-amber-500 p-4 text-white shadow-md relative">
+            <!-- CLIENT TOP HEADER (Premium Dark Orange Gradient Style) -->
+            <div class="bg-gradient-to-br from-orange-600 to-red-600 p-5 text-white shadow-lg relative">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">🌶️</div>
+                        <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md flex items-center justify-center bg-white">
+                            <!-- Real Logo Loaded with robust fallback -->
+                            <img src="ChatGPT Image 23 มิ.ย. 2569 12_32_09.png" alt="ตำแซ่บ ซ.4" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('client-logo-fallback').style.display='flex'">
+                            <div id="client-logo-fallback" class="hidden absolute inset-0 items-center justify-center text-2xl">🌶️</div>
+                        </div>
                         <div>
-                            <h2 class="font-bold text-lg leading-tight">ตำแซ่บ ซ.4</h2>
-                            <p class="text-xs text-orange-100 font-light">แซ่บซี๊ดถึงใจ วัตถุดิบสดใหม่ทุกวัน</p>
+                            <h2 class="font-extrabold text-base leading-tight tracking-wide">ตำแซ่บ ซ.4</h2>
+                            <p class="text-[11px] text-orange-100 font-light">รสเด็ด แซ่บนัว ส่งตรงถึงโต๊ะคุณ</p>
                         </div>
                     </div>
                     <!-- Select Table / Service Options -->
                     <div class="relative">
-                        <select id="client-table-select" onchange="handleClientTableChange()" class="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-1.5 px-3 rounded-lg border border-white/30 focus:outline-none cursor-pointer">
+                        <select id="client-table-select" onchange="handleClientTableChange()" class="bg-black/20 hover:bg-black/30 text-white font-bold text-xs py-2 px-3 rounded-xl border border-white/20 focus:outline-none cursor-pointer">
                             <option value="A01" class="text-slate-800">โต๊ะ A01</option>
                             <option value="A02" selected class="text-slate-800">โต๊ะ A02</option>
                             <option value="A03" class="text-slate-800">โต๊ะ A03</option>
@@ -103,73 +76,70 @@
                 </div>
                 
                 <!-- Tab Switching in Client App -->
-                <div class="flex mt-4 bg-black/10 rounded-lg p-0.5 text-xs">
-                    <button id="tab-menu-btn" onclick="switchClientTab('menu')" class="flex-1 text-center py-1.5 rounded-md font-semibold bg-white text-orange-600 shadow-xs transition-all">
+                <div class="flex mt-5 bg-black/20 rounded-xl p-1 text-xs">
+                    <button id="tab-menu-btn" onclick="switchClientTab('menu')" class="flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm transition-all">
                         😋 เมนูแซ่บและเครื่องดื่ม
                     </button>
-                    <button id="tab-track-btn" onclick="switchClientTab('track')" class="flex-1 text-center py-1.5 rounded-md font-medium text-white hover:bg-white/5 transition-all flex items-center justify-center gap-1.5">
-                        📋 ติดตามสถานะและรอบบิล
-                        <span id="unpaid-order-badge" class="hidden bg-red-500 text-white w-2 h-2 rounded-full"></span>
+                    <button id="tab-track-btn" onclick="switchClientTab('track')" class="flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10 transition-all flex items-center justify-center gap-1.5">
+                        📋 ติดตามสถานะและบิล
+                        <span id="unpaid-order-badge" class="hidden bg-yellow-400 w-2 h-2 rounded-full"></span>
                     </button>
                 </div>
             </div>
 
             <!-- CLIENT CONTENT CONTAINER (SCROLLABLE) -->
-            <div class="flex-1 overflow-y-auto p-4 bg-slate-50/50" id="client-view-content">
+            <div class="flex-1 overflow-y-auto p-4 bg-slate-50" id="client-view-content">
                 
                 <!-- CLIENT SUB-TAB: MENU VIEW -->
                 <div id="client-menu-subtab">
                     
                     <!-- PROMOTION BANNER -->
-                    <div class="bg-amber-50 border border-amber-200/50 rounded-xl p-3 mb-4 flex items-center gap-3">
-                        <span class="text-2xl">✨</span>
+                    <div class="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-4 flex items-center gap-3.5">
+                        <span class="text-3xl">✨</span>
                         <div class="text-xs">
-                            <p class="font-bold text-amber-900">พิเศษวันนี้! สั่งยอดรวมครบ 300 บาท</p>
-                            <p class="text-amber-700">รับฟรี! ไข่ต้มยางมะตูมเยิ้มๆ ทันที 1 ฟอง</p>
+                            <p class="font-extrabold text-orange-950">พิเศษวันนี้! สั่งอาหารยอดรวมครบ 300 บาท</p>
+                            <p class="text-orange-700">รับฟรี! ไข่ต้มยางมะตูมเยิ้มๆ ทันที 1 ฟอง</p>
                         </div>
                     </div>
 
                     <!-- CLIENT CATEGORIES FILTER -->
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-2" id="client-categories-list">
-                        <!-- Dynamically filled with categories -->
+                        <!-- Filled dynamically -->
                     </div>
 
                     <!-- CLIENT FOOD ITEMS CONTAINER -->
                     <div class="grid grid-cols-2 gap-3" id="client-food-grid">
-                        <!-- Dynamically filled with menu items -->
+                        <!-- Filled dynamically -->
                     </div>
                 </div>
 
                 <!-- CLIENT SUB-TAB: TRACKING VIEW -->
                 <div id="client-track-subtab" class="hidden space-y-4">
-                    <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-                        <h3 class="text-sm font-bold text-slate-800 mb-2 flex items-center justify-between">
-                            <span>สถานะโต๊ะของคุณ</span>
-                            <span id="table-track-name" class="bg-orange-100 text-orange-700 font-bold px-2 py-0.5 rounded-md text-xs">โต๊ะ A02</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">ระบบจะทำการจัดกลุ่มรายการที่คุณสั่งสะสมทั้งหมดไว้จนกว่าจะกดปุ่มแจ้งชำระเงิน</p>
+                    <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">สถานะบริการปัจจุบันของคุณ</h3>
+                        <div class="flex items-center justify-between">
+                            <span id="table-track-name" class="bg-orange-600 text-white font-black px-3 py-1 rounded-lg text-sm">โต๊ะ A02</span>
+                            <span class="text-xs text-slate-500">ระบบคุมยอดสะสมอาหารของท่านไว้ให้แล้ว</span>
+                        </div>
                     </div>
 
                     <!-- Tracking Cards Lists -->
                     <div id="client-tracking-list" class="space-y-3">
-                        <!-- Dynamically populated with active orders for this table -->
+                        <!-- Filled dynamically -->
                     </div>
 
                     <!-- Auxiliary Quick Service Actions -->
-                    <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                    <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
                         <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">🔔 บริการเรียกพนักงานด่วน</h4>
                         <div class="grid grid-cols-2 gap-2">
-                            <button onclick="requestService('เรียกพนักงาน', '👩‍💼 พนักงานกำลังเดินไปที่โต๊ะของท่าน')" class="border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg p-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                            <button onclick="requestService('เรียกพนักงาน', '👩‍💼 พนักงานกำลังเดินไปดูแลท่านที่โต๊ะครับ')" class="border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl p-3 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
                                 🔔 เรียกพนักงาน
                             </button>
-                            <button onclick="requestService('ขอเช็คบิล', '💵 ระบบรับเรื่องแจ้งเช็คบิลแล้ว พนักงานกำลังสรุปยอดบิลไปให้ครับ')" class="border border-orange-200 hover:bg-orange-50 text-orange-700 rounded-lg p-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                            <button onclick="requestService('ขอเช็คบิล', '💵 รับเรื่องแจ้งเช็คบิลแล้ว พนักงานกำลังถือเครื่องมาหาครับ')" class="border border-orange-200 hover:bg-orange-50 text-orange-700 rounded-xl p-3 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
                                 💵 ขอเช็คบิล
                             </button>
-                            <button onclick="requestService('ขอช้อน/น้ำเพิ่ม', '🍽 พนักงานกำลังเตรียมนำช้อนส้อม/น้ำ มาเสิร์ฟเพิ่มครับ')" class="border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg p-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all" colspan="2">
-                                🍽 ขอช้อน / น้ำเพิ่ม
-                            </button>
-                            <button onclick="switchClientTab('menu')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg p-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                                🔁 สั่งอาหารเพิ่ม
+                            <button onclick="requestService('ขอช้อน/น้ำเพิ่ม', '🍽 พนักงานกำลังเตรียมช้อนชาม/น้ำดื่ม เสิร์ฟเพิ่มครับ')" class="border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl p-3 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all col-span-2">
+                                🍽 ขอช้อน / น้ำดื่มเพิ่ม
                             </button>
                         </div>
                     </div>
@@ -177,13 +147,13 @@
 
             </div>
 
-            <!-- CLIENT BOTTOM FLOATING CART SUMMARY (ACTIVE ON MENU TAB) -->
-            <div id="client-floating-cart-bar" class="bg-white border-t border-slate-100 p-4 flex items-center justify-between shadow-lg">
+            <!-- CLIENT BOTTOM FLOATING CART SUMMARY -->
+            <div id="client-floating-cart-bar" class="bg-white border-t border-slate-100 p-4 flex items-center justify-between shadow-2xl relative z-10">
                 <div>
-                    <p class="text-xs text-slate-500">รวมตะกร้าสินค้า</p>
-                    <p class="text-lg font-bold text-orange-600"><span id="cart-item-count">0</span> รายการ | ฿<span id="cart-total-price">0</span></p>
+                    <p class="text-xs text-slate-400">รายการในตะกร้าชั่วคราว</p>
+                    <p class="text-base font-black text-orange-600"><span id="cart-item-count">0</span> อย่าง | ฿<span id="cart-total-price">0</span></p>
                 </div>
-                <button onclick="openCartModal()" class="bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                <button onclick="openCartModal()" class="bg-orange-600 hover:bg-orange-700 active:scale-95 text-white font-bold text-sm px-5 py-3 rounded-2xl shadow-lg transition-all flex items-center gap-1.5">
                     🛒 ตรวจสอบตะกร้า
                 </button>
             </div>
@@ -191,30 +161,89 @@
         </div>
 
         <!-- ==================== RIGHT COLUMN: KITCHEN & CASHIER OPERATIONS ==================== -->
+        <!-- Contains both staff control parameters & operations queues to keep customer view 100% clean -->
         <div class="lg:col-span-7 space-y-6">
             
-            <!-- BACKEND ACTION SUB-HEADER (CASHIER TAB & STATUS) -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-md">
-                <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <!-- ==================== SYSTEM OPERATION HEADER (FOR STAFF ONLY) ==================== -->
+            <!-- Relocated here to ensure it only renders on backend dashboard view -->
+            <div id="system-header" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">⚙️</span>
+                        <div>
+                            <h1 class="text-sm font-black tracking-wide flex items-center gap-2">
+                                แผงควบคุมระบบหลังบ้าน <span class="bg-orange-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">STAFF ONLY</span>
+                            </h1>
+                            <p class="text-[11px] text-slate-400">ควบคุมเมนูครัว จัดการคิวโต๊ะ และควบคุมฐานข้อมูล Google Sheet</p>
+                        </div>
+                    </div>
+                    
+                    <!-- DB Indicator Badge -->
+                    <div id="db-status-badge" class="flex items-center gap-1.5 bg-green-950/80 text-green-400 px-3 py-1.5 rounded-xl text-xs font-semibold border border-green-800">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                        เชื่อมกูเกิลชีทสำเร็จ
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-800">
+                    <button onclick="toggleViewMode()" class="bg-slate-850 hover:bg-slate-800 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all">
+                        🔄 สลับโหมดใช้งานจริง / จำลอง
+                    </button>
+                    <button onclick="manualSync()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5">
+                        ⚡ ดึงชีทล่าสุด
+                    </button>
+                </div>
+            </div>
+
+            <!-- BACKEND ACTION: CASHIER GRID -->
+            <div class="bg-white rounded-3xl border border-slate-100 p-5 shadow-lg">
+                <h2 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
                     🖥️ ระบบจัดการเงินและโต๊ะ (Cashier Grid)
                 </h2>
                 
                 <!-- Table Statuses Dashboard -->
                 <div class="grid grid-cols-4 md:grid-cols-7 gap-3" id="cashier-table-grid">
-                    <!-- Dynamically populated tables (A01 - A05, Takeaway, Delivery) with statuses -->
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+
+            <!-- GOOGLE SHEET CONNECTION DIAGNOSTIC GUIDE (SHOWS ON ERROR) -->
+            <div id="db-diagnostic-box" class="hidden bg-orange-50 border border-orange-200 rounded-3xl p-5 shadow-sm space-y-3">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⚠️</span>
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-bold text-orange-950">ตรวจพบลักษณะออฟไลน์ชั่วคราว (วินิจฉัยเพื่อแก้ปัญหา)</h3>
+                        <p class="text-xs text-orange-800 leading-relaxed">
+                            ระบบกำลังรันโดยใช้ข้อมูลจำลองแทนเนื่องจากเชื่อมต่อ API ขัดข้อง โปรดตรวจสอบวิธีการติดตั้ง Google Sheet ของคุณเพื่อความสมบูรณ์ในการบันทึกข้อมูล:
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-[11px] text-orange-900">
+                    <div class="bg-white/80 p-3 rounded-2xl border border-orange-100">
+                        <p class="font-bold mb-1">1. สิทธิ์การเข้าถึง Web App</p>
+                        <p class="text-orange-700 leading-relaxed">ตรวจเช็กในตอนกด **Deploy** ของ Apps Script ว่าตั้งค่าตรงคำว่า *Who has access* เป็น **"Anyone"** หรือยัง</p>
+                    </div>
+                    <div class="bg-white/80 p-3 rounded-2xl border border-orange-100">
+                        <p class="font-bold mb-1">2. ตรวจสอบชื่อแผ่นงาน (Sheet)</p>
+                        <p class="text-orange-700 leading-relaxed">ใน Google Sheets แท็บทั้ง 4 ต้องชื่อสะกดตัวใหญ่ตามนี้เป๊ะๆ: **MENU**, **CATEGORIES**, **ORDERS**, **ORDER_ITEMS**</p>
+                    </div>
+                    <div class="bg-white/80 p-3 rounded-2xl border border-orange-100">
+                        <p class="font-bold mb-1">3. บัญชีที่ใช้ Deploy</p>
+                        <p class="text-orange-700 leading-relaxed">ตอนอัปเดตสคริปต์ ต้องเลือก *Execute as* เป็น **"Me"** เพื่ออนุญาตให้ระบบดึงข้อมูลแทนลูกค้าได้</p>
+                    </div>
                 </div>
             </div>
 
             <!-- KITCHEN INCOMING QUEUE -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-md flex flex-col min-h-[480px]">
+            <div class="bg-white rounded-3xl border border-slate-100 p-5 shadow-lg flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                     <div>
-                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            🍳 รายการคิวเตรียมอาหารในห้องครัว (Kitchen Panel)
+                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            🍳 รายการเตรียมอาหารในครัว (Kitchen Panel)
                         </h2>
-                        <p class="text-xs text-slate-400">อัปเดตสถานะการปรุงอาหารและติดตามออเดอร์เรียลไทม์</p>
+                        <p class="text-xs text-slate-400">พ่อครัวกดเปลี่ยนสถานะเพื่อแจ้งความคืบหน้าให้ฝั่งลูกค้าเห็นเรียลไทม์</p>
                     </div>
-                    <span id="kitchen-count-badge" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0 คิวค้าง</span>
+                    <span id="kitchen-count-badge" class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full">0 คิวค้าง</span>
                 </div>
 
                 <!-- Kitchen Pending Order Cards -->
@@ -222,8 +251,8 @@
                     <!-- Dynamically loaded cooking orders -->
                     <div id="empty-kitchen-state" class="col-span-full flex flex-col items-center justify-center py-16 text-slate-300">
                         <span class="text-5xl mb-3">🥗</span>
-                        <p class="text-sm font-semibold text-slate-400">ยังไม่มีรายการคิวอาหารค้างทำในครัว</p>
-                        <p class="text-xs text-slate-300">เมื่อลูกค้าสแกนสั่งจากมือถือ คำสั่งซื้อจะมาปรากฏขึ้นที่นี่ทันที</p>
+                        <p class="text-sm font-semibold text-slate-400">ยังไม่มีรายการคิวอาหารค้างทำ</p>
+                        <p class="text-xs text-slate-300">เมื่อลูกค้าสั่งซื้อ รายการจะมาเด้งจัดระบบคิวให้ที่นี่โดยอัตโนมัติ</p>
                     </div>
                 </div>
             </div>
@@ -235,15 +264,15 @@
     <!-- ==================== MODALS & POPUPS ==================== -->
 
     <!-- 🌶️ CUSTOMIZER MODAL (SPICINESS & NOTES) -->
-    <div id="customize-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
-            <div class="relative bg-gradient-to-r from-orange-500 to-amber-500 p-4 text-white">
-                <button onclick="closeCustomizeModal()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-black/10 hover:bg-black/20 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold">×</button>
+    <div id="customize-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
+            <div class="relative bg-gradient-to-r from-orange-600 to-red-600 p-5 text-white">
+                <button onclick="closeCustomizeModal()" class="absolute top-5 right-5 text-white bg-black/10 hover:bg-black/20 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold">×</button>
                 <div class="flex items-center gap-3">
-                    <span id="modal-food-icon" class="text-3xl bg-white/20 w-12 h-12 rounded-xl flex items-center justify-center">🥗</span>
+                    <span id="modal-food-icon" class="text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center">🥗</span>
                     <div>
-                        <h3 id="modal-food-name" class="font-bold text-lg leading-tight">ชื่อเมนูอาหาร</h3>
-                        <p id="modal-food-price" class="text-sm text-orange-50 font-semibold">฿0</p>
+                        <h3 id="modal-food-name" class="font-extrabold text-base leading-tight">ชื่อเมนูอาหาร</h3>
+                        <p id="modal-food-price" class="text-sm text-orange-100 font-bold">฿0</p>
                     </div>
                 </div>
             </div>
@@ -251,43 +280,39 @@
             <div class="p-5 space-y-4">
                 <!-- Spiciness Option -->
                 <div id="spiciness-section" class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">🌶️ เลือกระดับความเผ็ด</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block">🌶️ เลือกระดับความเผ็ด</label>
                     <div class="grid grid-cols-4 gap-2">
-                        <label class="border border-slate-200 rounded-xl p-2 text-center block cursor-pointer hover:bg-slate-50 transition-all select-none">
-                            <input type="radio" name="spiciness" value="ไม่เผ็ด" class="sr-only">
-                            <span class="text-xs block font-semibold text-slate-700">ไม่เผ็ด</span>
-                            <span class="text-xs text-slate-400">🌶️❌</span>
-                        </label>
-                        <label class="border border-slate-200 rounded-xl p-2 text-center block cursor-pointer hover:bg-slate-50 transition-all select-none">
-                            <input type="radio" name="spiciness" value="เผ็ดน้อย" class="sr-only" checked>
-                            <span class="text-xs block font-semibold text-slate-700">เผ็ดน้อย</span>
-                            <span class="text-xs text-slate-400">🌶️</span>
-                        </label>
-                        <label class="border border-slate-200 rounded-xl p-2 text-center block cursor-pointer hover:bg-slate-50 transition-all select-none">
-                            <input type="radio" name="spiciness" value="เผ็ดกลาง" class="sr-only">
-                            <span class="text-xs block font-semibold text-slate-700">เผ็ดกลาง</span>
-                            <span class="text-xs text-slate-400">🌶️🌶️</span>
-                        </label>
-                        <label class="border border-slate-200 rounded-xl p-2 text-center block cursor-pointer hover:bg-slate-50 transition-all select-none">
-                            <input type="radio" name="spiciness" value="เผ็ดมาก" class="sr-only">
-                            <span class="text-xs block font-semibold text-slate-700">เผ็ดมาก</span>
-                            <span class="text-xs text-slate-400">🌶️🌶️🌶️</span>
-                        </label>
+                        <button type="button" onclick="selectSpiciness('ไม่เผ็ด')" id="sp-btn-ไม่เผ็ด" class="sp-choice-btn border border-slate-200 rounded-2xl p-2.5 text-center hover:bg-slate-50 transition-all focus:outline-none block select-none">
+                            <span class="text-xs block font-bold text-slate-700">ไม่เผ็ด</span>
+                            <span class="text-[10px] text-slate-400">🌶️❌</span>
+                        </button>
+                        <button type="button" onclick="selectSpiciness('เผ็ดน้อย')" id="sp-btn-เผ็ดน้อย" class="sp-choice-btn border border-slate-200 rounded-2xl p-2.5 text-center hover:bg-slate-50 transition-all focus:outline-none block select-none">
+                            <span class="text-xs block font-bold text-slate-700">เผ็ดน้อย</span>
+                            <span class="text-[10px] text-slate-400">🌶️</span>
+                        </button>
+                        <button type="button" onclick="selectSpiciness('เผ็ดกลาง')" id="sp-btn-เผ็ดกลาง" class="sp-choice-btn border border-slate-200 rounded-2xl p-2.5 text-center hover:bg-slate-50 transition-all focus:outline-none block select-none">
+                            <span class="text-xs block font-bold text-slate-700">เผ็ดกลาง</span>
+                            <span class="text-[10px] text-slate-400">🌶️🌶️</span>
+                        </button>
+                        <button type="button" onclick="selectSpiciness('เผ็ดมาก')" id="sp-btn-เผ็ดมาก" class="sp-choice-btn border border-slate-200 rounded-2xl p-2.5 text-center hover:bg-slate-50 transition-all focus:outline-none block select-none">
+                            <span class="text-xs block font-bold text-slate-700">เผ็ดมาก</span>
+                            <span class="text-[10px] text-slate-400">🌶️🌶️🌶️</span>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Custom Request Input Box -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">📝 บันทึกพิเศษถึงห้องครัว</label>
-                    <textarea id="modal-food-notes" rows="2" placeholder="เช่น ไม่ไส่ชูรส, ขอหวานน้อย, คอหมูติดมันน้อย..." class="w-full text-xs border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all bg-slate-50/50"></textarea>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block">📝 บันทึกพิเศษ (ต้องการ / ไม่ต้องการอะไรพิมพ์บอกที่นี่)</label>
+                    <textarea id="modal-food-notes" rows="2.5" placeholder="ตัวอย่าง: ไม่พริก, ไม่โรยถั่ว, ขอติดมันเยอะๆ, ไม่ชูรส..." class="w-full text-xs border border-slate-200 rounded-2xl p-3 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all bg-slate-50"></textarea>
                 </div>
 
                 <!-- Quantity Control -->
                 <div class="flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span class="text-sm font-semibold text-slate-600">เลือกจำนวน</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase">เลือกจำนวนที่สั่ง</span>
                     <div class="flex items-center gap-3">
                         <button onclick="adjustModalQty(-1)" class="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center font-bold text-slate-600 hover:bg-slate-100 active:scale-90 transition-all">-</button>
-                        <span id="modal-qty-text" class="font-bold text-slate-800 text-base">1</span>
+                        <span id="modal-qty-text" class="font-extrabold text-slate-800 text-base">1</span>
                         <button onclick="adjustModalQty(1)" class="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center font-bold text-slate-600 hover:bg-slate-100 active:scale-90 transition-all">+</button>
                     </div>
                 </div>
@@ -295,7 +320,7 @@
 
             <!-- Save Action Button -->
             <div class="p-4 bg-slate-50 border-t border-slate-100">
-                <button id="add-to-cart-btn" onclick="confirmAddToCart()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all">
+                <button id="add-to-cart-btn" onclick="confirmAddToCart()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
                     🛒 เพิ่มลงตะกร้าสินค้า
                 </button>
             </div>
@@ -303,15 +328,15 @@
     </div>
 
     <!-- 🛒 SHOPPING CART MODAL -->
-    <div id="cart-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200 flex flex-col max-h-[90vh]">
-            <div class="p-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg flex items-center gap-2">🛒 ตะกร้าของโต๊ะ <span id="cart-table-badge" class="bg-white/20 px-2 py-0.5 rounded text-xs">A02</span></h3>
+    <div id="cart-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200 flex flex-col max-h-[90vh]">
+            <div class="p-4 bg-gradient-to-r from-orange-600 to-red-600 text-white flex justify-between items-center">
+                <h3 class="font-extrabold text-sm flex items-center gap-2">🛒 รายการตะกร้าชั่วคราว - <span id="cart-table-badge" class="bg-white/20 px-2 py-0.5 rounded text-xs">A02</span></h3>
                 <button onclick="closeCartModal()" class="text-white/80 hover:text-white bg-black/10 hover:bg-black/20 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold">×</button>
             </div>
             
             <!-- Cart Items List (Scrollable) -->
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
                 <!-- Dynamically listed cart items -->
             </div>
 
@@ -323,33 +348,33 @@
                         <span class="font-semibold text-slate-800">฿<span id="cart-subtotal">0</span></span>
                     </div>
                     <div class="flex justify-between">
-                        <span>ค่าบริการบริการด่วน (ฟรี)</span>
-                        <span class="font-semibold text-green-600">฿0</span>
+                        <span>บริการเสริมพนักงานด่วน</span>
+                        <span class="font-semibold text-green-600">ฟรี</span>
                     </div>
                     <div class="flex justify-between border-t border-slate-100 pt-2 text-sm">
-                        <span class="font-bold text-slate-800">ยอดรวมสุทธิ</span>
-                        <span class="font-bold text-orange-600 text-base">฿<span id="cart-grandtotal">0</span></span>
+                        <span class="font-bold text-slate-800">ยอดสุทธิรอบสั่งซื้อนี้</span>
+                        <span class="font-extrabold text-orange-600 text-base">฿<span id="cart-grandtotal">0</span></span>
                     </div>
                 </div>
 
-                <button id="submit-order-btn" onclick="submitOrderToBackend()" class="w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2">
-                    🔥 ยืนยันการสั่งซื้อส่งครัว
+                <button id="submit-order-btn" onclick="submitOrderToBackend()" class="w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white font-black py-4 px-4 rounded-2xl shadow-lg transition-all text-sm flex items-center justify-center gap-2">
+                    🔥 ยืนยันคำสั่งซื้อส่งห้องครัว
                 </button>
             </div>
         </div>
     </div>
 
     <!-- 💰 CASHIER CHECKOUT / BILL MODAL -->
-    <div id="billing-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
+    <div id="billing-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
             <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg flex items-center gap-1.5">💵 รายละเอียดการเช็คบิลสะสม - <span id="bill-table-title" class="bg-orange-500 text-white px-2 py-0.5 rounded text-xs">โต๊ะ A02</span></h3>
+                <h3 class="font-bold text-sm flex items-center gap-1.5">💵 เช็คบิลสะสมรายโต๊ะ - <span id="bill-table-title" class="bg-orange-600 text-white px-2.5 py-0.5 rounded text-xs">A02</span></h3>
                 <button onclick="closeBillingModal()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold">×</button>
             </div>
 
             <div class="p-5 space-y-4">
-                <div class="bg-amber-50 rounded-xl p-3 border border-amber-100 flex items-center justify-between text-xs text-amber-900">
-                    <span>ประเภทบริการ:</span>
+                <div class="bg-amber-50 rounded-2xl p-3 border border-amber-150 flex items-center justify-between text-xs text-amber-900">
+                    <span>ประเภทการให้บริการ:</span>
                     <span id="bill-service-type" class="font-bold">ทานที่ร้าน (Dine-in)</span>
                 </div>
 
@@ -358,7 +383,7 @@
                     <table class="w-full text-xs text-slate-600">
                         <thead>
                             <tr class="border-b border-slate-100 text-slate-400 font-bold uppercase">
-                                <th class="text-left py-2">เมนูอาหาร</th>
+                                <th class="text-left py-2">เมนูอาหารที่ปรุงแล้ว</th>
                                 <th class="text-center py-2">จำนวน</th>
                                 <th class="text-right py-2">ราคา</th>
                             </tr>
@@ -371,35 +396,35 @@
 
                 <!-- Total calculations -->
                 <div class="border-t border-slate-100 pt-3 space-y-1.5 text-xs text-slate-500">
-                    <div class="flex justify-between text-base font-bold text-slate-800">
-                        <span>ยอดค้างชำระสะสม</span>
-                        <span class="text-orange-600">฿<span id="bill-grand-total">0</span></span>
+                    <div class="flex justify-between text-base font-black text-slate-800">
+                        <span>ยอดรวมสะสมทั้งหมดของรอบอาหารนี้</span>
+                        <span class="text-orange-600 text-lg">฿<span id="bill-grand-total">0</span></span>
                     </div>
                 </div>
             </div>
 
             <!-- Action buttons for cashier -->
             <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2">
-                <button onclick="closeBillingModal()" class="flex-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl transition-all text-xs">
+                <button onclick="closeBillingModal()" class="flex-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition-all text-xs">
                     ปิดหน้าต่าง
                 </button>
-                <button id="cashier-confirm-pay-btn" onclick="payOffTableBill()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all text-xs">
-                    💰 ชำระเงินเรียบร้อย
+                <button id="cashier-confirm-pay-btn" onclick="payOffTableBill()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-black py-3 px-4 rounded-xl shadow-lg transition-all text-xs">
+                    💰 รับชำระเงินและปิดรอบ
                 </button>
             </div>
         </div>
     </div>
 
     <!-- 🔔 TOAST MESSAGE SYSTEM -->
-    <div id="toast-message" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/90 text-white text-xs py-3 px-6 rounded-full shadow-lg z-50 flex items-center gap-2 max-w-sm transition-all">
-        <span id="toast-icon">💡</span>
-        <span id="toast-text">ข้อความแจ้งเตือนที่นี่...</span>
+    <div id="toast-message" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 text-white text-xs py-3.5 px-6 rounded-full shadow-2xl z-50 flex items-center gap-2 max-w-sm transition-all border border-slate-800">
+        <span id="toast-icon">🌶️</span>
+        <span id="toast-text">แจ้งข่าวสารระบบ...</span>
     </div>
 
     <!-- CORE LOGIC SCRIPTS -->
     <script>
         // ==================== SYSTEM & API CONFIGURATION ====================
-        // เปลี่ยนเป็น false เพื่อดึงข้อมูลจริงจาก Google Sheets
+        // โหมดเชื่อมต่อ API จริง: ตั้งค่าเป็น false เพื่อเริ่มรันข้อมูลจากกูเกิลชีท
         let IS_SIMULATION = false; 
         
         // ลิงก์ Apps Script API URL ของคุณ Get Patradit
@@ -445,6 +470,7 @@
         let activeTableForBill = null;
         let cart = [];
         let currentCustomizingItem = null;
+        let selectedSpiciness = "เผ็ดน้อย"; // Default spiciness state
 
         // Auto Poll interval ID
         let autoSyncInterval = null;
@@ -475,33 +501,35 @@
 
         function updateHeaderStatus() {
             const h = document.getElementById('system-header');
+            const badge = document.getElementById('db-status-badge');
             if (IS_SIMULATION) {
-                h.classList.add('bg-slate-100');
-                h.querySelector('.bg-green-50').innerHTML = `
+                h.classList.add('bg-slate-800');
+                badge.innerHTML = `
                     <span class="w-2.5 h-2.5 bg-amber-500 rounded-full"></span>
-                    จำลองสถานะระบบ (Simulation)
+                    โหมดจำลองระบบออฟไลน์ (Simulation)
                 `;
-                h.querySelector('.bg-green-50').className = "flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-amber-200";
+                badge.className = "flex items-center gap-1.5 bg-amber-950 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-semibold border border-amber-800";
+                document.getElementById('db-diagnostic-box').classList.add('hidden');
             } else {
-                h.classList.remove('bg-slate-100');
-                h.querySelector('.bg-amber-50, .bg-green-50').innerHTML = `
+                h.classList.remove('bg-slate-800');
+                badge.innerHTML = `
                     <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
-                    เชื่อมต่อฐานข้อมูล Google Sheets
+                    เชื่อมกูเกิลชีทสำเร็จ
                 `;
-                h.querySelector('.bg-amber-50, .bg-green-50').className = "flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-green-200";
+                badge.className = "flex items-center gap-1.5 bg-green-950 text-green-400 px-3 py-1.5 rounded-lg text-xs font-semibold border border-green-800";
             }
         }
 
         function toggleViewMode() {
             IS_SIMULATION = !IS_SIMULATION;
             updateHeaderStatus();
-            showToast(IS_SIMULATION ? "💡 สลับเข้าโหมดจำลองออฟไลน์" : "⚡ สลับเข้าโหมดเชื่อม Google Sheets จริง", "🛠️");
+            showToast(IS_SIMULATION ? "💡 สลับเข้าโหมดจำลองออฟไลน์สำเร็จ" : "⚡ สลับเข้าโหมดเชื่อม Google Sheets จริง", "🛠️");
             loadInitialData();
         }
 
         async function manualSync() {
             if (IS_SIMULATION) {
-                showToast("คุณกำลังใช้งานโหมดจำลอง กรุณาสลับเป็นโหมดใช้งานจริง", "⚠️");
+                showToast("ระบบกำลังทำงานในโหมดจำลอง สลับเป็นระบบจริงก่อนกดดึงข้อมูลนะครับ", "⚠️");
                 return;
             }
             showToast("กำลังดึงข้อมูลล่าสุดจาก Google Sheets...", "⏳");
@@ -524,7 +552,7 @@
         async function syncWithGoogleSheet() {
             try {
                 const response = await fetch(`${API_URL}?action=getData`);
-                if (!response.ok) throw new Error("API call failed");
+                if (!response.ok) throw new Error("API Connection Failed");
                 const data = await response.json();
                 
                 if (data.status === "success") {
@@ -544,10 +572,16 @@
                     if (activeTableForBill) {
                         renderBillingModalDetails(activeTableForBill);
                     }
+                    // Hide warning box on successful connection
+                    document.getElementById('db-diagnostic-box').classList.add('hidden');
                 }
             } catch (err) {
                 console.error("Error fetching sheet data:", err);
                 showToast("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้ จะใช้ระบบจำลองทดแทน", "❌");
+                
+                // Show diagnostic instructions box
+                document.getElementById('db-diagnostic-box').classList.remove('hidden');
+
                 // Use local data silently
                 renderClientCategories();
                 renderClientMenuItems();
@@ -561,9 +595,9 @@
         function renderClientCategories() {
             const container = document.getElementById('client-categories-list');
             let html = `
-                <button onclick="filterClientCategory('ทั้งหมด')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                <button onclick="filterClientCategory('ทั้งหมด')" class="flex-shrink-0 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
                     clientSelectedCategory === 'ทั้งหมด' 
-                    ? 'bg-orange-500 text-white shadow-md' 
+                    ? 'bg-orange-600 text-white shadow-md' 
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                 }">
                     🌱 ทั้งหมด
@@ -574,11 +608,11 @@
                 const isClosed = cat.status !== 'open';
                 const pillLabel = isClosed ? `🔒 ${cat.category_name} (ปิด)` : `${cat.icon} ${cat.category_name}`;
                 const activeClass = clientSelectedCategory === cat.category_name 
-                    ? 'bg-orange-500 text-white shadow-md' 
-                    : (isClosed ? 'bg-slate-100 text-slate-400 border border-slate-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50');
+                    ? 'bg-orange-600 text-white shadow-md' 
+                    : (isClosed ? 'bg-slate-100 text-slate-400 border border-slate-200 pointer-events-none' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50');
 
                 html += `
-                    <button onclick="filterClientCategory('${cat.category_name}')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeClass}">
+                    <button onclick="filterClientCategory('${cat.category_name}')" class="flex-shrink-0 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${activeClass}">
                         ${pillLabel}
                     </button>
                 `;
@@ -598,7 +632,7 @@
 
             if (filteredMenu.length === 0) {
                 container.innerHTML = `
-                    <div class="col-span-2 text-center py-10 text-slate-400 text-xs">
+                    <div class="col-span-2 text-center py-12 text-slate-400 text-xs">
                         ไม่มีอาหารในหมวดหมู่นี้ขณะนี้
                     </div>
                 `;
@@ -606,7 +640,7 @@
             }
 
             filteredMenu.forEach(item => {
-                // Check if its parent category is closed
+                // Check if parent category is closed
                 const parentCat = localCategories.find(c => c.category_name === item.category);
                 const isCategoryClosed = parentCat ? parentCat.status !== 'open' : false;
                 const isSoldOut = item.status === 'sold out';
@@ -623,17 +657,17 @@
                 }
 
                 const cardHtml = `
-                    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden relative flex flex-col justify-between ${disabledMarkup}">
+                    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-250 overflow-hidden relative flex flex-col justify-between ${disabledMarkup}">
                         ${statusBadge}
                         <div class="p-4 flex flex-col items-center text-center">
                             <span class="text-4xl bg-orange-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-3">${item.image || '🥗'}</span>
                             <h4 class="font-bold text-slate-800 text-sm mb-1">${item.name}</h4>
-                            <p class="text-[10px] text-slate-400 line-clamp-2 h-7 overflow-hidden mb-3">${item.desc || 'สูตรแซ่บต้นตำรับจากทางร้าน'}</p>
+                            <p class="text-[10px] text-slate-400 line-clamp-2 h-7 overflow-hidden mb-3">${item.desc || 'สูตรแซ่บจัดจ้านเอกลักษณ์ของร้าน'}</p>
                         </div>
                         
                         <div class="bg-slate-50 border-t border-slate-100 p-3 flex items-center justify-between">
-                            <span class="text-sm font-bold text-slate-800">฿${item.price}</span>
-                            <button onclick="openCustomizeModal('${item.menu_id}')" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs transition-all flex items-center gap-1">
+                            <span class="text-sm font-black text-slate-800">฿${item.price}</span>
+                            <button onclick="openCustomizeModal('${item.menu_id}')" class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1">
                                 + สั่งเลย
                             </button>
                         </div>
@@ -669,10 +703,10 @@
 
                 itemsList.forEach(item => {
                     const spicinessBadge = item.spiciness ? `<span class="text-red-500 font-bold">(${item.spiciness})</span>` : '';
-                    const noteMarkup = item.notes ? `<div class="bg-red-50 text-red-700 text-[10px] rounded px-2 py-0.5 mt-0.5 font-medium animate-shake">⚠️ โน้ต: ${item.notes}</div>` : '';
+                    const noteMarkup = item.notes ? `<div class="bg-red-50 text-red-700 text-[10px] rounded-lg px-2.5 py-1 mt-1 font-medium animate-shake">⚠️ โน้ต: ${item.notes}</div>` : '';
                     
                     itemsMarkup += `
-                        <li class="py-1 border-b border-dashed border-slate-100 last:border-0">
+                        <li class="py-1.5 border-b border-dashed border-slate-100 last:border-0">
                             <div class="flex justify-between text-xs text-slate-700">
                                 <span class="font-medium">${item.menu} ${spicinessBadge}</span>
                                 <span class="font-bold text-slate-900">x${item.qty}</span>
@@ -687,28 +721,28 @@
 
                 if (o.status === 'new') {
                     statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">🟡 รับออเดอร์ใหม่</span>`;
-                    actionBtn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking')" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold py-2 rounded-lg shadow-sm transition-all">🧑‍🍳 เริ่มปรุงอาหาร</button>`;
+                    actionBtn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking')" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-[11px] font-bold py-2 rounded-xl shadow-sm transition-all">🧑‍🍳 เริ่มปรุงอาหาร</button>`;
                 } else if (o.status === 'cooking') {
                     statusBadge = `<span class="bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">🟠 กำลังปรุงค้าง</span>`;
-                    actionBtn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-[11px] font-bold py-2 rounded-lg shadow-sm transition-all">🔔 ปรุงเสร็จพร้อมเสิร์ฟ</button>`;
+                    actionBtn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-[11px] font-bold py-2 rounded-xl shadow-sm transition-all">🔔 ปรุงเสร็จพร้อมเสิร์ฟ</button>`;
                 } else if (o.status === 'ready') {
                     statusBadge = `<span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">🟢 พร้อมเสิร์ฟ</span>`;
-                    actionBtn = `<button onclick="updateOrderStatus('${o.order_id}', 'served')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-2 rounded-lg shadow-sm transition-all">🍽️ เสิร์ฟเรียบร้อย</button>`;
+                    actionBtn = `<button onclick="updateOrderStatus('${o.order_id}', 'served')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-2 rounded-xl shadow-sm transition-all">🍽️ เสิร์ฟเรียบร้อย</button>`;
                 }
 
                 const cardHtml = `
-                    <div class="bg-white border border-slate-150 rounded-2xl shadow-sm overflow-hidden flex flex-col justify-between">
+                    <div class="bg-white border border-slate-150 rounded-3xl shadow-sm overflow-hidden flex flex-col justify-between">
                         <div class="p-4 space-y-3">
                             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                                 <span class="text-xs font-bold text-slate-400">#${o.order_id}</span>
-                                <span class="bg-slate-900 text-white font-bold text-xs px-2.5 py-0.5 rounded">${o.table}</span>
+                                <span class="bg-slate-950 text-white font-extrabold text-xs px-3 py-1 rounded-lg">${o.table}</span>
                             </div>
                             
                             <ul class="space-y-1">
                                 ${itemsMarkup}
                             </ul>
                             
-                            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                            <div class="flex items-center justify-between text-[11px] text-slate-450 pt-1">
                                 <span>สั่งเมื่อ: ${o.time}</span>
                                 ${statusBadge}
                             </div>
@@ -730,7 +764,6 @@
             const tableIdentifiers = ["A01", "A02", "A03", "A04", "A05", "Takeaway", "Delivery"];
             
             tableIdentifiers.forEach(tCode => {
-                // Gather unpaid items total and special status alert
                 const activeOrdersForTable = localOrders.filter(o => o.table === tCode && o.status !== 'paid');
                 
                 let activeSum = 0;
@@ -739,14 +772,9 @@
                 
                 activeOrdersForTable.forEach(o => {
                     activeSum += parseFloat(o.total || 0);
-                    // Check if they triggered checkout call
-                    if (o.status === 'ready' || o.status === 'served') {
-                        // customer active
-                    }
                 });
 
-                // Let's scan local orders for a special billing request status
-                // If table called checkout
+                // Scan local alerts inside sessions
                 const currentTableAlert = sessionStorage.getItem(`alert_${tCode}`);
                 if (currentTableAlert === "ขอเช็คบิล") {
                     hasWaitingCheckbill = true;
@@ -761,16 +789,16 @@
                     indicatorCircle = 'bg-red-500 animate-ping';
                     actionText = '🚨 รอชำระ';
                 } else if (isEating) {
-                    colorStyle = 'border-amber-300 bg-amber-50 text-amber-900';
-                    indicatorCircle = 'bg-amber-500';
+                    colorStyle = 'border-orange-300 bg-orange-50/50 text-orange-950';
+                    indicatorCircle = 'bg-orange-600';
                     actionText = `฿${activeSum}`;
                 }
 
                 const displayName = tCode === "Takeaway" ? "🥡 กลับบ้าน" : (tCode === "Delivery" ? "🛵 ส่งนอก" : `โต๊ะ ${tCode}`);
 
                 const elementHtml = `
-                    <button onclick="openBillingModal('${tCode}')" class="border rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all shadow-xs relative ${colorStyle}">
-                        <span class="text-xs font-bold block mb-1.5">${displayName}</span>
+                    <button onclick="openBillingModal('${tCode}')" class="border rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all shadow-xs relative ${colorStyle}">
+                        <span class="text-xs font-black block mb-1.5">${displayName}</span>
                         <div class="flex items-center gap-1.5 text-[10px] font-bold">
                             <span class="w-2 h-2 rounded-full ${indicatorCircle}"></span>
                             <span>${actionText}</span>
@@ -789,9 +817,9 @@
 
             if (activeOrders.length === 0) {
                 container.innerHTML = `
-                    <div class="bg-white rounded-xl p-8 text-center border border-slate-100 shadow-sm text-slate-400 text-xs">
+                    <div class="bg-white rounded-2xl p-8 text-center border border-slate-100 shadow-xs text-slate-400 text-xs">
                         <span class="text-4xl block mb-2">🍽️</span>
-                        ยังไม่มีประวัติการสั่งสะสมในรอบโต๊ะนี้
+                        ยังไม่มีรายการอาหารสั่งสะสมในรอบบริการของโต๊ะนี้
                     </div>
                 `;
                 return;
@@ -804,9 +832,9 @@
                 itemsList.forEach(item => {
                     const extraSpicy = item.spiciness ? `(${item.spiciness})` : '';
                     itemsRows += `
-                        <div class="flex justify-between items-center text-xs text-slate-600 border-b border-dashed border-slate-100 py-1 last:border-0">
+                        <div class="flex justify-between items-center text-xs text-slate-600 border-b border-dashed border-slate-100 py-1.5 last:border-0">
                             <span>- ${item.menu} <span class="text-red-500">${extraSpicy}</span></span>
-                            <span class="font-bold">x${item.qty}</span>
+                            <span class="font-bold text-slate-800">x${item.qty}</span>
                         </div>
                     `;
                 });
@@ -829,22 +857,22 @@
                 }
 
                 const cardHtml = `
-                    <div class="bg-white rounded-xl p-4 border border-slate-150 shadow-xs space-y-3">
+                    <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-xs space-y-3">
                         <div class="flex justify-between items-center">
                             <div>
-                                <span class="text-xs font-bold text-slate-400">#${o.order_id}</span>
+                                <span class="text-[10px] font-bold text-slate-400">เลขจาน: #${o.order_id}</span>
                                 <span class="text-[10px] text-slate-400 block">${o.time}</span>
                             </div>
-                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${stateColor}">${stateText}</span>
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${stateColor}">${stateText}</span>
                         </div>
                         
-                        <div class="space-y-1">
+                        <div class="space-y-0.5">
                             ${itemsRows}
                         </div>
                         
                         <div class="flex justify-between items-center border-t border-slate-100 pt-2.5">
-                            <span class="text-xs text-slate-400 font-medium">รวมยอดจานนี้</span>
-                            <span class="text-sm font-bold text-orange-600">฿${o.total}</span>
+                            <span class="text-xs text-slate-400 font-bold">รวมยอดจานนี้</span>
+                            <span class="text-sm font-extrabold text-orange-600">฿${o.total}</span>
                         </div>
                     </div>
                 `;
@@ -869,14 +897,14 @@
             const cartBar = document.getElementById('client-floating-cart-bar');
 
             if (tabName === "menu") {
-                menuTabBtn.className = "flex-1 text-center py-1.5 rounded-md font-semibold bg-white text-orange-600 shadow-xs transition-all";
-                trackTabBtn.className = "flex-1 text-center py-1.5 rounded-md font-medium text-white hover:bg-white/5 transition-all";
+                menuTabBtn.className = "flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm transition-all";
+                trackTabBtn.className = "flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10 transition-all";
                 menuSubtab.classList.remove('hidden');
                 trackSubtab.classList.add('hidden');
                 cartBar.classList.remove('hidden');
             } else {
-                menuTabBtn.className = "flex-1 text-center py-1.5 rounded-md font-medium text-white hover:bg-white/5 transition-all";
-                trackTabBtn.className = "flex-1 text-center py-1.5 rounded-md font-semibold bg-white text-orange-600 shadow-xs transition-all";
+                menuTabBtn.className = "flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10 transition-all";
+                trackTabBtn.className = "flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm transition-all";
                 menuSubtab.classList.add('hidden');
                 trackSubtab.classList.remove('hidden');
                 cartBar.classList.add('hidden');
@@ -903,7 +931,24 @@
             }
         }
 
-        // ==================== CUSTOMIZE & NOTES MODAL LOGIC ====================
+        // ==================== SPICINESS & CUSTOMIZER LOGIC ====================
+
+        // ฟังก์ชันเลือกระดับความเผ็ดและไฮไลต์ปุ่มทันที
+        function selectSpiciness(level) {
+            selectedSpiciness = level;
+            
+            // ลบคลาสแอคทีฟออกจากทุกปุ่มความเผ็ดก่อน
+            const buttons = document.querySelectorAll('.sp-choice-btn');
+            buttons.forEach(btn => {
+                btn.className = "sp-choice-btn border border-slate-200 rounded-2xl p-2.5 text-center hover:bg-slate-50 transition-all focus:outline-none block select-none";
+            });
+
+            // เพิ่มสไตล์ส้มเข้มและไฮไลต์ที่เด่นชัดให้กับปุ่มที่ถูกเลือก
+            const activeBtn = document.getElementById(`sp-btn-${level}`);
+            if (activeBtn) {
+                activeBtn.className = "sp-choice-btn border-2 border-orange-600 bg-orange-50 rounded-2xl p-2.5 text-center transition-all focus:outline-none block select-none ring-2 ring-orange-100";
+            }
+        }
 
         function openCustomizeModal(menuId) {
             const item = localMenu.find(m => m.menu_id === menuId);
@@ -921,13 +966,12 @@
             const spicinessSection = document.getElementById('spiciness-section');
             if (item.category === "ส้มตำ" || item.category === "อาหารอีสาน") {
                 spicinessSection.classList.remove('hidden');
+                // ตั้งค่าความเผ็ดตั้งต้นเป็น เผ็ดน้อย และสั่งรันอัปเดตสีปุ่ม
+                selectSpiciness("เผ็ดน้อย");
             } else {
                 spicinessSection.classList.add('hidden');
+                selectedSpiciness = ""; // Clear spiciness logic for drinks/other
             }
-
-            // Reset selected Spiciness
-            const spRadio = document.getElementsByName('spiciness');
-            spRadio[1].checked = true; // default value: เผ็ดน้อย
 
             document.getElementById('customize-modal').classList.remove('hidden');
         }
@@ -950,25 +994,14 @@
 
             const qty = parseInt(document.getElementById('modal-qty-text').innerText);
             const notes = document.getElementById('modal-food-notes').value.trim();
-            
-            let spiciness = null;
-            if (currentCustomizingItem.category === "ส้มตำ" || currentCustomizingItem.category === "อาหารอีสาน") {
-                const spRadio = document.getElementsByName('spiciness');
-                for (let r of spRadio) {
-                    if (r.checked) {
-                        spiciness = r.value;
-                        break;
-                    }
-                }
-            }
 
-            // Add item to global cart
+            // Add item to global cart with chosen states
             const cartItem = {
                 id: currentCustomizingItem.menu_id,
                 name: currentCustomizingItem.name,
                 price: currentCustomizingItem.price,
                 qty: qty,
-                spiciness: spiciness,
+                spiciness: selectedSpiciness,
                 notes: notes,
                 image: currentCustomizingItem.image
             };
@@ -976,7 +1009,7 @@
             cart.push(cartItem);
             updateClientCartSummary();
             closeCustomizeModal();
-            showToast(`🛒 หยิบ ${currentCustomizingItem.name} ลงตะกร้าแล้ว!`, "😋");
+            showToast(`🛒 เพิ่ม ${currentCustomizingItem.name} ลงในตะกร้าแล้ว!`, "😋");
         }
 
         function updateClientCartSummary() {
@@ -999,7 +1032,7 @@
 
         function openCartModal() {
             if (cart.length === 0) {
-                showToast("ยังไม่มีรายการในตะกร้าเลย กรุณาเลือกสั่งอาหารก่อนนะครับ", "⚠️");
+                showToast("ยังไม่มีของในตะกร้าเลยครับ ลองจิ้มเลือกเมนูอาหารก่อนนะ", "⚠️");
                 return;
             }
 
@@ -1019,32 +1052,32 @@
             let sumPrice = 0;
 
             cart.forEach((c, index) => {
-                const spMarkup = c.spiciness ? `<span class="bg-red-100 text-red-800 text-[9px] font-bold px-1.5 py-0.5 rounded">${c.spiciness}</span>` : '';
-                const notesMarkup = c.notes ? `<p class="text-[10px] text-red-500 font-medium">📝 ${c.notes}</p>` : '';
+                const spMarkup = c.spiciness ? `<span class="bg-red-50 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded-md">🌶️ ${c.spiciness}</span>` : '';
+                const notesMarkup = c.notes ? `<p class="text-[10px] text-red-500 font-medium">📝 หมายเหตุ: ${c.notes}</p>` : '';
                 const lineTotal = c.price * c.qty;
                 sumPrice += lineTotal;
 
                 const itemHtml = `
-                    <div class="bg-white rounded-xl p-3 border border-slate-100 shadow-xs flex items-center justify-between gap-3">
+                    <div class="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="text-2xl bg-orange-50 w-9 h-9 rounded-lg flex items-center justify-center">${c.image || '🥗'}</span>
+                            <span class="text-2xl bg-orange-50 w-9 h-9 rounded-xl flex items-center justify-center">${c.image || '🥗'}</span>
                             <div class="space-y-0.5">
                                 <h4 class="font-bold text-xs text-slate-800">${c.name}</h4>
                                 <div class="flex gap-1 items-center">
-                                    <span class="text-[10px] text-slate-400 font-semibold">฿${c.price}</span>
+                                    <span class="text-[10px] text-slate-400 font-bold">฿${c.price}</span>
                                     ${spMarkup}
                                 </div>
                                 ${notesMarkup}
                             </div>
                         </div>
                         
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="adjustCartItemQty(${index}, -1)" class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-600 hover:bg-slate-100 active:scale-90">-</button>
-                                <span class="font-bold text-xs text-slate-800">${c.qty}</span>
-                                <button onclick="adjustCartItemQty(${index}, 1)" class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-600 hover:bg-slate-100 active:scale-90">+</button>
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex items-center gap-1">
+                                <button onclick="adjustCartItemQty(${index}, -1)" class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-600 hover:bg-slate-100">-</button>
+                                <span class="font-bold text-xs text-slate-800 min-w-[14px] text-center">${c.qty}</span>
+                                <button onclick="adjustCartItemQty(${index}, 1)" class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-600 hover:bg-slate-100">+</button>
                             </div>
-                            <span class="text-xs font-bold text-slate-800 min-w-[40px] text-right">฿${lineTotal}</span>
+                            <span class="text-xs font-black text-slate-800 min-w-[40px] text-right">฿${lineTotal}</span>
                         </div>
                     </div>
                 `;
@@ -1058,7 +1091,6 @@
         function adjustCartItemQty(index, val) {
             cart[index].qty += val;
             if (cart[index].qty < 1) {
-                // Remove item
                 cart.splice(index, 1);
             }
             if (cart.length === 0) {
@@ -1069,14 +1101,13 @@
             updateClientCartSummary();
         }
 
-        // SUBMIT FOOD TO BACKEND (APPS SCRIPT OR OFF-LINE EMULATOR)
+        // SUBMIT FOOD TO BACKEND
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
 
             const orderId = "O" + Math.floor(1000 + Math.random() * 9000);
             const orderTime = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
             
-            // Generate raw items string summary
             const itemsSummary = cart.map(c => `${c.name} x${c.qty}`).join(", ");
             let totalSum = 0;
             cart.forEach(c => totalSum += (c.price * c.qty));
@@ -1099,17 +1130,15 @@
                 notes: c.notes || ""
             }));
 
-            // Show loading indicator
             const submitBtn = document.getElementById('submit-order-btn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "⏳ กำลังบันทึกส่งห้องครัว...";
+            submitBtn.innerText = "⏳ กำลังส่งอาหารเข้าคิวห้องครัว...";
 
             if (IS_SIMULATION) {
                 // Save locally
                 localOrders.push(newOrder);
                 localOrderItems.push(...newItemsList);
                 
-                // Finalize locally
                 setTimeout(() => {
                     cart = [];
                     updateClientCartSummary();
@@ -1120,7 +1149,7 @@
                     updateUnpaidBadge();
                     
                     switchClientTab('track');
-                    showToast("🔥 ส่งออเดอร์เข้าไปที่ห้องครัวสำเร็จแล้ว!", "🧑‍🍳");
+                    showToast("🔥 ส่งออเดอร์เข้าไปที่คิวครัวสำเร็จแล้ว!", "🧑‍🍳");
                     
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งครัว`;
@@ -1134,14 +1163,14 @@
                         items: newItemsList
                     };
 
-                    const response = await fetch(API_URL, {
+                    await fetch(API_URL, {
                         method: "POST",
-                        mode: "no-cors", // Required for basic Apps Script execution inside sandboxes
+                        mode: "no-cors",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(postPayload)
                     });
 
-                    // Since no-cors doesn't allow parsing JSON response, wait slightly and trigger manual fetch
+                    // Wait and trigger manual fetch
                     setTimeout(async () => {
                         cart = [];
                         updateClientCartSummary();
@@ -1149,7 +1178,7 @@
                         
                         await syncWithGoogleSheet();
                         switchClientTab('track');
-                        showToast("🔥 ส่งออเดอร์เข้าคิวในกูเกิลชีทแล้ว!", "🧑‍🍳");
+                        showToast("🔥 ส่งออเดอร์เข้าคิวในกูเกิลชีทจริงสำเร็จ!", "🧑‍🍳");
                         
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งครัว`;
@@ -1157,9 +1186,9 @@
 
                 } catch (err) {
                     console.error("Submit order error:", err);
-                    showToast("เครือข่ายเชื่อมต่อขัดข้อง กำลังสลับเซฟลงหน่วยความจำชั่วคราวแทน", "⚠️");
+                    showToast("สัญญาณขาดหาย กำลังสลับบันทึกแบบออฟไลน์สำรองชั่วคราว", "⚠️");
                     
-                    // Fallback to offline save to prevent order loss
+                    // Fallback to offline save
                     localOrders.push(newOrder);
                     localOrderItems.push(...newItemsList);
                     cart = [];
@@ -1186,10 +1215,10 @@
                     renderKitchenDashboard();
                     renderCashierGrid();
                     updateUnpaidBadge();
-                    showToast(`เปลี่ยนสถานะคำสั่งซื้อ #${orderId} เรียบร้อย`, "🧑‍🍳");
+                    showToast(`อัปเดตออเดอร์ #${orderId} แล้ว`, "🧑‍🍳");
                 }
             } else {
-                showToast("กำลังอัปเดตสถานะขึ้นชีท...", "⏳");
+                showToast("กำลังส่งสถานะใหม่เข้ากูเกิลชีท...", "⏳");
                 try {
                     await fetch(API_URL, {
                         method: "POST",
@@ -1204,12 +1233,12 @@
 
                     setTimeout(async () => {
                         await syncWithGoogleSheet();
-                        showToast(`เปลี่ยนสถานะคำสั่งซื้อ #${orderId} แล้ว!`, "🧑‍🍳");
+                        showToast(`อัปเดตออเดอร์ #${orderId} เข้ากูเกิลชีทแล้ว!`, "🧑‍🍳");
                     }, 1200);
 
                 } catch (err) {
                     console.error("Error updating order status:", err);
-                    showToast("ล้มเหลวในการส่งสถานะไปที่กูเกิลชีท", "❌");
+                    showToast("ระบบขัดข้อง ไม่สามารถอัปเดตคิวขึ้นชีทได้", "❌");
                 }
             }
         }
@@ -1220,15 +1249,13 @@
             const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid');
             
             if (activeOrders.length === 0) {
-                // Table is empty, check if there is an offline help request
                 const alertText = sessionStorage.getItem(`alert_${tableCode}`);
                 if (alertText) {
-                    // Clear simple alert notification
                     sessionStorage.removeItem(`alert_${tableCode}`);
                     renderCashierGrid();
-                    showToast(`รับเรื่องสิการแจ้งเตือนโต๊ะ ${tableCode} เรียบร้อย`, "ℹ️");
+                    showToast(`พนักงานรับทราบการติดต่อที่ โต๊ะ ${tableCode} แล้วครับ`, "ℹ️");
                 } else {
-                    showToast(`สถานะปัจจุบัน: โต๊ะ ${tableCode} ยังไม่มีคำสั่งซื้อเปิดบริการค้างสะสม`, "🟢");
+                    showToast(`ปัจจุบัน โต๊ะ ${tableCode} ยังไม่มีบิลสั่งอาหารค้างชำระ`, "🟢");
                 }
                 return;
             }
@@ -1245,7 +1272,7 @@
 
         function renderBillingModalDetails(tableCode) {
             document.getElementById('bill-table-title').innerText = tableCode === "Takeaway" ? "🥡 กลับบ้าน" : (tableCode === "Delivery" ? "🛵 ส่งนอก" : `โต๊ะ ${tableCode}`);
-            document.getElementById('bill-service-type').innerText = tableCode === "Takeaway" ? "🥡 ซื้อกลับบ้าน (Takeaway)" : (tableCode === "Delivery" ? "🛵 จัดส่งเดลิเวอรี่ (Delivery)" : "🍽️ ทานที่ร้านอาหาร (Dine-in)");
+            document.getElementById('bill-service-type').innerText = tableCode === "Takeaway" ? "🥡 บริการซื้อกลับบ้าน (Takeaway)" : (tableCode === "Delivery" ? "🛵 จัดส่งภายนอก (Delivery)" : "🍽️ ทานที่ร้าน (Dine-in)");
 
             const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid');
             const tbody = document.getElementById('billing-items-rows');
@@ -1253,19 +1280,17 @@
 
             let grandTotal = 0;
             
-            // Loop through unpaid orders to collect subitems
             activeOrders.forEach(o => {
                 const subItems = localOrderItems.filter(i => i.order_id === o.order_id);
-                
                 subItems.forEach(item => {
                     const rowPrice = item.price * item.qty;
                     grandTotal += rowPrice;
                     
                     const rowHtml = `
                         <tr class="border-b border-slate-50">
-                            <td class="py-2 text-left">${item.menu} <span class="text-[9px] text-slate-400">(${o.order_id})</span></td>
-                            <td class="py-2 text-center font-bold">${item.qty}</td>
-                            <td class="py-2 text-right font-bold text-slate-800">฿${rowPrice}</td>
+                            <td class="py-2.5 text-left">${item.menu} <span class="text-[9px] text-slate-400">(${o.order_id})</span></td>
+                            <td class="py-2.5 text-center font-bold">${item.qty}</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800">฿${rowPrice}</td>
                         </tr>
                     `;
                     tbody.innerHTML += rowHtml;
@@ -1282,10 +1307,9 @@
             const payBtn = document.getElementById('cashier-confirm-pay-btn');
             
             payBtn.disabled = true;
-            payBtn.innerText = "⏳ กำลังปิดยอดบิล...";
+            payBtn.innerText = "⏳ กำลังบันทึกปิดบิล...";
 
             if (IS_SIMULATION) {
-                // Find all unpaid orders of this table and set to PAID status
                 localOrders.forEach((o, index) => {
                     if (o.table === tCode && o.status !== 'paid') {
                         localOrders[index].status = 'paid';
@@ -1293,7 +1317,6 @@
                 });
 
                 setTimeout(() => {
-                    // Clear simple alert notes
                     sessionStorage.removeItem(`alert_${tCode}`);
                     
                     closeBillingModal();
@@ -1301,9 +1324,9 @@
                     renderKitchenDashboard();
                     updateUnpaidBadge();
                     
-                    showToast(`💰 โต๊ะ ${tCode} เคลียร์ชำระค่าอาหารเรียบร้อย ปิดยอดสะสม!`, "🟢");
+                    showToast(`💰 โต๊ะ ${tCode} เคลียร์ยอดบิลสำเร็จ! ขอบคุณที่มาใช้บริการครับ`, "🟢");
                     payBtn.disabled = false;
-                    payBtn.innerText = "💰 ชำระเงินเรียบร้อย";
+                    payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                 }, 800);
             } else {
                 try {
@@ -1321,17 +1344,17 @@
                         sessionStorage.removeItem(`alert_${tCode}`);
                         await syncWithGoogleSheet();
                         closeBillingModal();
-                        showToast(`💰 โต๊ะ ${tCode} ปิดรอบชำระลง Google Sheets แล้ว!`, "🟢");
+                        showToast(`💰 ยิงปิดยอดชำระเงิน โต๊ะ ${tCode} เข้า Google Sheets เรียบร้อย!`, "🟢");
                         
                         payBtn.disabled = false;
-                        payBtn.innerText = "💰 ชำระเงินเรียบร้อย";
+                        payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                     }, 1200);
 
                 } catch (err) {
                     console.error("Pay bill error:", err);
-                    showToast("ไม่สามารถส่งข้อมูลจบยอดชำระเงินไปยังกูเกิลชีทได้", "❌");
+                    showToast("ไม่สามารถอัปเดตสถานะชำระเงินเข้า Google Sheets ได้", "❌");
                     payBtn.disabled = false;
-                    payBtn.innerText = "💰 ชำระเงินเรียบร้อย";
+                    payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                 }
             }
         }
@@ -1339,20 +1362,12 @@
         // ==================== OTHER AUX ACTIONS ====================
 
         function requestService(alertType, clientConfirmationMsg) {
-            // Register an alert on client interface
             showToast(clientConfirmationMsg, "🔔");
-
-            // Save state inside sessions to allow the dashboard to display it
             sessionStorage.setItem(`alert_${currentClientTable}`, alertType);
             renderCashierGrid();
-            
-            // If in production mode, also send an update request or write dummy note
-            if (!IS_SIMULATION) {
-                // In real world, we could create a tiny service ticket in sheets,
-                // but the local session-based triggers serve as high-speed notifications here.
-            }
         }
 
+        // ==================== TOAST & UTILITIES ====================
         function showToast(text, icon = "🌶️") {
             const toast = document.getElementById('toast-message');
             document.getElementById('toast-icon').innerText = icon;
