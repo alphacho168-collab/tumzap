@@ -550,7 +550,6 @@
     <!-- CORE LOGIC SCRIPTS -->
     <script>
         // ==================== SYSTEM & API CONFIGURATION ====================
-        // โหมดเชื่อมต่อ API จริง: ตั้งค่าเป็น false เพื่อเริ่มรันข้อมูลจากกูเกิลชีทจริง
         let IS_SIMULATION = false; 
         
         // ลิงก์ Apps Script API URL ของคุณ Get Patradit
@@ -565,7 +564,7 @@
         ];
 
         let localMenu = [
-            { menu_id: "M001", name: "ตำไทย", price: 50, category: "ส้มตำ", image: "🥗", desc: "ตำไทยรสเด็ด หวี่นเปรี้ยวกลมกล่อม", status: "open" },
+            { menu_id: "M001", name: "ตำไทย", price: 50, category: "ส้มตำ", image: "🥗", desc: "ตำไทยรสเด็ด หวานเปรี้ยวกลมกล่อม", status: "open" },
             { menu_id: "M002", name: "ตำปูปลาร้า", price: 60, category: "ส้มตำ", image: "🌶️", desc: "ส้มตำปลาร้านัวๆ รสชาติถึงอกถึงใจ", status: "open" },
             { menu_id: "M003", name: "ตำซั่ว", price: 60, category: "ส้มตำ", image: "🍜", desc: "ตำปูปลาร้าใส่เส้นขนมจีนเหนียวนุ่ม", status: "open" },
             { menu_id: "M004", name: "ตำแตง", price: 50, category: "ส้มตำ", image: "🥒", desc: "ตำแตงกวากรอบนัวๆ ชื่นใจสุดๆ", status: "open" },
@@ -597,30 +596,40 @@
         let activePaymentMode = "cash";
         let cart = [];
         let currentCustomizingItem = null;
-        let selectedSpiciness = "เผ็ดน้อย"; // Default spiciness state
-        let orderIdPendingCancel = null; // Stores target order id during secure cancellation prompt
+        let selectedSpiciness = "เผ็ดน้อย"; 
+        let orderIdPendingCancel = null; 
 
         // Auto Poll interval ID
         let autoSyncInterval = null;
 
-        // ==================== INITIALIZATION WITH LOCAL STORAGE CACHE ====================
+        // ==================== INITIALIZATION WITH SAFE CACHE GUARD ====================
         window.onload = function() {
-            // Restore Google Sheet real data cache immediately on page load! (ENSURES INSTANT LOAD!)
-            const cachedCats = localStorage.getItem('tumzap_categories');
-            const cachedMenu = localStorage.getItem('tumzap_menu');
-            const cachedOrders = localStorage.getItem('tumzap_orders');
-            const cachedOrderItems = localStorage.getItem('tumzap_order_items');
+            // SAFE CACHE GUARD: Only load from cache if it contains healthy non-empty structures
+            try {
+                const cachedCats = localStorage.getItem('tumzap_categories');
+                const cachedMenu = localStorage.getItem('tumzap_menu');
+                const cachedOrders = localStorage.getItem('tumzap_orders');
+                const cachedOrderItems = localStorage.getItem('tumzap_order_items');
 
-            if (cachedCats) localCategories = JSON.parse(cachedCats);
-            if (cachedMenu) localMenu = JSON.parse(cachedMenu);
-            if (cachedOrders) localOrders = JSON.parse(cachedOrders);
-            if (cachedOrderItems) localOrderItems = JSON.parse(cachedOrderItems);
+                if (cachedCats) {
+                    const parsedCats = JSON.parse(cachedCats);
+                    if (parsedCats && parsedCats.length > 0) localCategories = parsedCats;
+                }
+                if (cachedMenu) {
+                    const parsedMenu = JSON.parse(cachedMenu);
+                    if (parsedMenu && parsedMenu.length > 0) localMenu = parsedMenu;
+                }
+                if (cachedOrders) localOrders = JSON.parse(cachedOrders);
+                if (cachedOrderItems) localOrderItems = JSON.parse(cachedOrderItems);
+            } catch (err) {
+                console.error("Cache reading bypassed due to mismatch structure:", err);
+            }
 
-            // Set default headers and render restored cache immediately (Instant Menu Display!)
+            // Always enforce default headers and render restored cache immediately
             updateHeaderStatus();
             renderAll();
             
-            // Check query param for table (e.g., ?table=A03)
+            // Check table parameter
             const urlParams = new URLSearchParams(window.location.search);
             const tableParam = urlParams.get('table');
             if (tableParam) {
@@ -628,10 +637,10 @@
                 document.getElementById('client-table-select').value = tableParam;
             }
             
-            // Always pull latest data from Google Sheets in the background silently
+            // Background update to sync sheets
             syncWithGoogleSheet();
 
-            // Setup background polling (Every 5 seconds for instant real-time kitchen experience!)
+            // Background polling (Every 5 seconds)
             autoSyncInterval = setInterval(() => {
                 if (!IS_SIMULATION) {
                     syncWithGoogleSheet();
@@ -678,12 +687,7 @@
             IS_SIMULATION = !IS_SIMULATION;
             updateHeaderStatus();
             showToast(IS_SIMULATION ? "💡 สลับเข้าโหมดจำลองออฟไลน์สำเร็จ" : "⚡ สลับเข้าโหมดเชื่อม Google Sheets จริง", "🛠️");
-            
-            if (IS_SIMULATION) {
-                renderAll();
-            } else {
-                syncWithGoogleSheet();
-            }
+            renderAll();
         }
 
         async function manualSync() {
@@ -696,17 +700,15 @@
         }
 
         async function loadInitialData() {
-            if (IS_SIMULATION) {
-                renderAll();
-            } else {
+            renderAll();
+            if (!IS_SIMULATION) {
                 await syncWithGoogleSheet();
             }
         }
 
-        // FETCH DATA FROM GOOGLE APPS SCRIPT AND UPDATE LOCAL CACHE
+        // FETCH DATA FROM GOOGLE APPS SCRIPT AND UPDATE LOCAL CACHE WITH SAFE-GUARDS
         async function syncWithGoogleSheet() {
             try {
-                // Fetch the latest published data
                 const response = await fetch(`${API_URL}?action=getInitialData`);
                 if (!response.ok) throw new Error("API Connection Failed");
                 const data = await response.json();
@@ -725,7 +727,7 @@
                         localStorage.setItem('tumzap_orders', JSON.stringify(data.orders));
                         localStorage.setItem('tumzap_has_real_data', 'true'); // Flag indicating successful sync
                         
-                        // CRITICAL CRASH-PROOF PARSER: Prevents JavaScript crashes when parsing order items from Sheets!
+                        // Parse order items dynamically from the Orders sheet tab
                         localOrderItems = [];
                         localOrders.forEach(o => {
                             let parsedItems = [];
@@ -752,22 +754,20 @@
                         });
                         localStorage.setItem('tumzap_order_items', JSON.stringify(localOrderItems));
                     }
-                    // Hide warning box on successful connection
                     document.getElementById('db-diagnostic-box').classList.add('hidden');
                 } else {
-                    console.warn("Apps Script success returned false. Falling back to local cache.", data.error);
                     document.getElementById('db-diagnostic-box').classList.remove('hidden');
                 }
             } catch (err) {
                 console.error("Error fetching sheet data:", err);
                 document.getElementById('db-diagnostic-box').classList.remove('hidden');
             } finally {
-                // ALWAYS render using either the newly fetched or the local cached data!
+                // ALWAYS render to avoid a blank screen under any network condition!
                 renderAll();
             }
         }
 
-        // ==================== SECURITY & LOGIN ACCESS CONTROLLERS ====================
+        // ==================== SECURITY & ACCESS CONTROLLERS ====================
         function openLoginModal() {
             document.getElementById('staff-password-input').value = "";
             document.getElementById('login-error-text').classList.add('hidden');
@@ -784,14 +784,12 @@
                 closeLoginModal();
                 showToast("🔓 เข้าสู่ระบบหลังบ้านสำเร็จ ยินดีต้อนรับครับ!", "🟢");
                 
-                // Hide customer app and reveal backoffice app
                 document.getElementById('customer-view-section').classList.add('hidden');
                 document.getElementById('staff-view-section').classList.remove('hidden');
                 
                 renderAll();
             } else {
                 document.getElementById('login-error-text').classList.remove('hidden');
-                // Shake modal logic
                 const modal = document.querySelector('#login-modal > div');
                 modal.classList.add('animate-shake');
                 setTimeout(() => modal.classList.remove('animate-shake'), 500);
@@ -799,13 +797,12 @@
         }
 
         function logoutStaff() {
-            // Settle views back to pure customer view
             document.getElementById('staff-view-section').classList.add('hidden');
             document.getElementById('customer-view-section').classList.remove('hidden');
             showToast("🚪 ออกจากระบบหลังบ้านแล้ว", "ℹ️");
         }
 
-        // ==================== RENDERING COMPONENT FUNCTIONS ====================
+        // ==================== RENDERING LOGIC ====================
         
         function getFallbackIcon(category, name) {
             const n = String(name || '').trim();
@@ -858,23 +855,19 @@
             container.innerHTML = html;
         }
 
-        // SMART FILTERED DISPLAY: Strictly show only items with real images in production!
+        // SMART FILTERED DISPLAY: Guaranteed to never be empty or display blank cards
         function renderClientMenuItems() {
             const container = document.getElementById('client-food-grid');
             container.innerHTML = '';
 
-            // Flag indicating if we successfully cached real data before
             const isRealSheetLoaded = localStorage.getItem('tumzap_has_real_data') === 'true';
 
             // Filter items: category + MUST have updated image URL (starts with http) in Production!
             let filteredMenu = localMenu.filter(item => {
                 if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
                 
-                // If in simulation mode, show all fallback emoji dishes
-                if (IS_SIMULATION) return true;
-                
-                // If we haven't successfully synced real sheet data yet, also show fallbacks so it's not empty!
-                if (!isRealSheetLoaded) return true;
+                // If in simulation mode OR if we haven't loaded any real sheet data yet, show all default emojis so it's not empty
+                if (IS_SIMULATION || !isRealSheetLoaded) return true;
                 
                 // If in production, strictly enforce hiding items without real uploaded image URLs!
                 const imgStr = item.image ? String(item.image).trim() : '';
@@ -882,7 +875,7 @@
                 return isUrl && item.name && String(item.name).trim() !== '';
             });
 
-            // CRITICAL ULTRA FALLBACK SECURE VALVE: If filtered menu is empty, show all items of the category anyway
+            // GOURMET ULTRA-SAFE VALVE: If the filtered menu is empty, fallback to ALL category items so the user NEVER sees a blank screen!
             if (filteredMenu.length === 0) {
                 filteredMenu = localMenu.filter(item => {
                     if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
@@ -1420,7 +1413,7 @@
             updateClientCartSummary();
         }
 
-        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (CORS HANG-PROOF)
+        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (CORS HANG-PROOF & OPTIMISTIC UI)
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
 
@@ -1464,7 +1457,7 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "⏳ กำลังส่งอาหารเข้าคิวห้องครัว...";
 
-            // HYBRID REAL-TIME ENGINE: Push local objects instantly for same-browser testing!
+            // 1. UPDATE LOCAL ENGINE INSTANTLY (Optimistic UI Update!)
             const localOrderMock = {
                 order_id: orderId,
                 table: currentClientTable,
@@ -1486,66 +1479,36 @@
             // Force local array merge instantly! This guarantees instant render in split tabs!
             localOrders.push(localOrderMock);
             localOrderItems.push(...localItemsMock);
-            renderAll();
+            
+            // 2. IMMEDIATE Snappy Transition (Do not make the customer wait on the spinner!)
+            cart = [];
+            updateClientCartSummary();
+            closeCartModal();
+            openOrderSuccessModal(currentClientTable, totalSum);
+            switchClientTab('track');
+            renderAll(); // Instantly update UI
 
-            if (IS_SIMULATION) {
-                setTimeout(() => {
-                    cart = [];
-                    updateClientCartSummary();
-                    closeCartModal();
-                    renderAll();
-                    
-                    // Trigger Instant Success Modal!
-                    openOrderSuccessModal(currentClientTable, totalSum);
-                    switchClientTab('track');
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งห้องครัว`;
-                }, 800);
-            } else {
-                try {
-                    // CORS HANG-PROOF WORKFLOW: Send to Google Sheets Web App as text/plain (fire-and-forget background push)
-                    // This resolves the exact problem shown in 'image_1afc78.jpg' where browser hangs waiting for no-cors response.
-                    fetch(API_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        body: JSON.stringify(postPayload)
-                    }).catch(err => console.warn("Background order submit log:", err));
+            // Reset submit button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `🔥 ยืนยันคำสั่งซื้อส่งห้องครัว`;
 
-                    // Snappy feedback: Customer gets success modal and redirect immediately!
-                    setTimeout(() => {
-                        cart = [];
-                        updateClientCartSummary();
-                        closeCartModal();
-                        
-                        openOrderSuccessModal(currentClientTable, totalSum);
-                        switchClientTab('track');
-                        
-                        // Silently sync sheets to update kitchen state
-                        syncWithGoogleSheet();
-
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งห้องครัว`;
-                    }, 400);
-
-                } catch (err) {
-                    console.error("Submit order error:", err);
-                    showToast("เครือข่ายขัดข้องเล็กน้อย ยืนยันออเดอร์ในแอปชั่วคราว", "⚠️");
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `🔥 ยืนยันการสั่งซื้อส่งห้องครัว`;
-                }
+            // 3. SILENT BACKGROUND ASYNCHRONOUS POST
+            if (!IS_SIMULATION) {
+                // Execute the post request in the background, fully insulated from the UI thread!
+                fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify(postPayload)
+                })
+                .then(() => {
+                    console.log("Background order submit succeeded.");
+                    // Fetch latest updates quietly
+                    syncWithGoogleSheet();
+                })
+                .catch(err => {
+                    console.warn("Background order submit log (handled):", err);
+                });
             }
-        }
-
-        // ==================== SUCCESS MODAL FOR CUSTOMER ====================
-        function openOrderSuccessModal(tableNum, totalPrice) {
-            document.getElementById('success-modal-table').innerText = tableNum === "Takeaway" ? "🥡 ซื้อกลับบ้าน" : (tableNum === "Delivery" ? "🛵 ส่งนอก" : `โต๊ะ ${tableNum}`);
-            document.getElementById('success-modal-total').innerText = totalPrice;
-            document.getElementById('order-success-modal').classList.remove('hidden');
-        }
-
-        function closeOrderSuccessModal() {
-            document.getElementById('order-success-modal').classList.add('hidden');
         }
 
         // ==================== KITCHEN ACTION CONTROLLERS ====================
@@ -1644,7 +1607,7 @@
             }
         }
 
-        // ==================== CASHIER ACTION CONTROLLERS & PROFESSIONAL CALCULATORS ====================
+        // ==================== CASHIER ACTION CONTROLLERS & CALCULATORS ====================
 
         function openBillingModal(tableCode) {
             const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid' && o.status !== 'cancelled');
@@ -1701,17 +1664,16 @@
             document.getElementById('bill-grand-total').innerText = grandTotal;
             document.getElementById('qr-total-placeholder').innerText = grandTotal;
             
-            // Set up dynamic PromptPay QR placeholder using popular API
-            const merchantPromptPayID = "0999999999"; // Replace with your actual merchant PromptPay ID (Phone or Tax ID)
+            // Generate PromptPay QR
+            const merchantPromptPayID = "0999999999"; 
             document.getElementById('promptpay-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://promptpay.io/${merchantPromptPayID}/${grandTotal}`;
 
-            // Reset Cash payment options
+            // Reset Cash options
             document.getElementById('cash-received-input').value = "";
             document.getElementById('cash-change-amount').innerText = "0";
             selectPayMode('cash');
         }
 
-        // Switching between Cash and QR code scanner tabs
         function selectPayMode(mode) {
             activePaymentMode = mode;
             const cashBtn = document.getElementById('pay-mode-cash-btn');
@@ -1732,7 +1694,6 @@
             }
         }
 
-        // Live calculator for cash change
         function calculateChange() {
             const grandTotal = parseFloat(document.getElementById('bill-grand-total').innerText) || 0;
             const received = parseFloat(document.getElementById('cash-received-input').value) || 0;
@@ -1758,11 +1719,9 @@
             calculateChange();
         }
 
-        // STREAMING_CHUNK: Processing payment closeouts and syncing paid states dynamically...
         async function payOffTableBill() {
             if (!activeTableForBill) return;
 
-            // Optional: check cash validation
             if (activePaymentMode === 'cash') {
                 const grandTotal = parseFloat(document.getElementById('bill-grand-total').innerText) || 0;
                 const received = parseFloat(document.getElementById('cash-received-input').value) || 0;
@@ -1795,21 +1754,19 @@
                 }, 800);
             } else {
                 try {
-                    // Fetch unpaid orders list for this table
                     const activeOrders = localOrders.filter(o => o.table === tCode && o.status !== 'paid' && o.status !== 'cancelled');
 
                     // Post general bill action
                     await fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
-                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             action: "billTable",
                             table: tCode
                         })
                     });
 
-                    // Multi-Fallback: Force-closed each order status to Paid in sheets
+                    // Update individual order statuses
                     for (let o of activeOrders) {
                         await fetch(API_URL, {
                             method: "POST",
@@ -1829,14 +1786,14 @@
                         showToast(`💰 ยิงปิดยอดชำระเงิน โต๊ะ ${tCode} สำเร็จ!`, "🟢");
                         
                         payBtn.disabled = false;
-                        payBtn.innerText = "💰 บันทึกชำระเงินและปิดรอบ";
+                        payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                     }, 1200);
 
                 } catch (err) {
                     console.error("Pay bill error:", err);
                     showToast("ไม่สามารถอัปเดตสถานะชำระเงินเข้า Google Sheets ได้", "❌");
                     payBtn.disabled = false;
-                    payBtn.innerText = "💰 บันทึกชำระเงินและปิดรอบ";
+                    payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                 }
             }
         }
@@ -1866,3 +1823,4 @@
     </script>
 </body>
 </html>
+```eof
