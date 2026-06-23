@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ตำแซ่บ ซ.4 - สั่งอาหารออนไลน์</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -883,7 +883,7 @@
             if (filteredMenu.length === 0) {
                 filteredMenu = localMenu.filter(item => {
                     if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
-                    return item.name && String(item.name).trim() !== '';
+                    return true;
                 });
             }
 
@@ -1417,7 +1417,7 @@
             updateClientCartSummary();
         }
 
-        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (100% CORRECTION)
+        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (100% FIXED)
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
 
@@ -1515,17 +1515,6 @@
             }
         }
 
-        // ==================== SUCCESS MODAL FOR CUSTOMER ====================
-        function openOrderSuccessModal(tableNum, totalPrice) {
-            document.getElementById('success-modal-table').innerText = tableNum === "Takeaway" ? "🥡 ซื้อกลับบ้าน" : (tableNum === "Delivery" ? "🛵 ส่งนอก" : `โต๊ะ ${tableNum}`);
-            document.getElementById('success-modal-total').innerText = totalPrice;
-            document.getElementById('order-success-modal').classList.remove('hidden');
-        }
-
-        function closeOrderSuccessModal() {
-            document.getElementById('order-success-modal').classList.add('hidden');
-        }
-
         // ==================== KITCHEN ACTION CONTROLLERS ====================
 
         async function updateOrderStatus(orderId, nextStatus) {
@@ -1603,7 +1592,6 @@
                 }
             } else {
                 try {
-                    // Push updated status directly to Apps Script API
                     await fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
@@ -1616,7 +1604,7 @@
 
                     setTimeout(async () => {
                         await syncWithGoogleSheet();
-                        showToast(`🛑 ยกเลิกออเดอร์ #${targetId} และบันทึกลง Google Sheets แล้ว!`, "🟢");
+                        showToast(`🛑 ยกเลิกออเดอร์ #${targetId} ใน Google Sheets สำเร็จ!`, "🟢");
                     }, 1200);
 
                 } catch (err) {
@@ -1626,7 +1614,7 @@
             }
         }
 
-        // ==================== CASHIER ACTION CONTROLLERS & PROFESSIONAL CALCULATORS ====================
+        // ==================== CASHIER ACTION CONTROLLERS & CALCULATORS ====================
 
         function openBillingModal(tableCode) {
             const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid' && o.status !== 'cancelled');
@@ -1842,3 +1830,4 @@
     </script>
 </body>
 </html>
+```eof
