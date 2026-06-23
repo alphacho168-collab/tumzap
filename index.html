@@ -52,7 +52,7 @@
                         <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md flex items-center justify-center bg-white">
                             <!-- Real Logo Loaded with robust fallback -->
                             <img src="ChatGPT Image 23 มิ.ย. 2569 12_32_09.png" alt="ตำแซ่บ ซ.4" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('client-logo-fallback').style.display='flex'">
-                            <div id="client-logo-fallback" class="hidden absolute inset-0 items-center justify-center text-2xl bg-white text-slate-900">🌶️</div>
+                            <div id="client-logo-fallback" class="hidden absolute inset-0 items-center justify-center text-2xl">🌶️</div>
                         </div>
                         <div>
                             <h2 class="font-extrabold text-base leading-tight tracking-wide">ตำแซ่บ ซ.4</h2>
@@ -87,7 +87,7 @@
                     </button>
                     <button id="tab-track-btn" onclick="switchClientTab('track')" class="flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10 transition-all flex items-center justify-center gap-1.5">
                         📋 ติดตามสถานะและบิล
-                        <span id="unpaid-order-badge" class="hidden bg-yellow-400 w-2 h-2 rounded-full animate-pulse"></span>
+                        <span id="unpaid-order-badge" class="hidden bg-yellow-400 w-2 h-2 rounded-full"></span>
                     </button>
                 </div>
             </div>
@@ -181,7 +181,7 @@
                     <div class="flex items-center gap-4">
                         <div class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-orange-500 shadow-md flex items-center justify-center bg-white">
                             <img src="ChatGPT Image 23 มิ.ย. 2569 12_32_09.png" alt="ตำแซ่บ ซ.4" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('staff-logo-fallback').style.display='flex'">
-                            <div id="staff-logo-fallback" class="hidden absolute inset-0 items-center justify-center text-xl bg-white text-slate-900">🌶️</div>
+                            <div id="staff-logo-fallback" class="hidden absolute inset-0 items-center justify-center text-xl">🌶️</div>
                         </div>
                         <div>
                             <h1 class="text-base font-black tracking-wide flex items-center gap-2">
@@ -440,7 +440,7 @@
                 <!-- Total calculations -->
                 <div class="border-t border-slate-100 pt-3 space-y-3">
                     <div class="flex justify-between text-base font-black text-slate-800">
-                        <span>ยอดรวมสะสมทั้งหมด:</span>
+                        <span>ยอดรวมสะสมทั้งหมดของรอบอาหารนี้</span>
                         <span class="text-orange-600 text-lg">฿<span id="bill-grand-total">0</span></span>
                     </div>
 
@@ -719,8 +719,12 @@
                         localStorage.setItem('tumzap_categories', JSON.stringify(data.categories));
                     }
                     if (data.menu && data.menu.length > 0) {
-                        localMenu = data.menu;
-                        localStorage.setItem('tumzap_menu', JSON.stringify(data.menu));
+                        // Filter out empty rows from sheets
+                        const validMenu = data.menu.filter(m => m.name && String(m.name).trim() !== '');
+                        if (validMenu.length > 0) {
+                            localMenu = validMenu;
+                            localStorage.setItem('tumzap_menu', JSON.stringify(validMenu));
+                        }
                     }
                     if (data.orders) {
                         localOrders = data.orders;
@@ -879,7 +883,7 @@
             if (filteredMenu.length === 0) {
                 filteredMenu = localMenu.filter(item => {
                     if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
-                    return true;
+                    return item.name && String(item.name).trim() !== '';
                 });
             }
 
@@ -1413,7 +1417,7 @@
             updateClientCartSummary();
         }
 
-        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (CORS HANG-PROOF & OPTIMISTIC UI)
+        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (100% CORRECTION)
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
 
@@ -1511,6 +1515,17 @@
             }
         }
 
+        // ==================== SUCCESS MODAL FOR CUSTOMER ====================
+        function openOrderSuccessModal(tableNum, totalPrice) {
+            document.getElementById('success-modal-table').innerText = tableNum === "Takeaway" ? "🥡 ซื้อกลับบ้าน" : (tableNum === "Delivery" ? "🛵 ส่งนอก" : `โต๊ะ ${tableNum}`);
+            document.getElementById('success-modal-total').innerText = totalPrice;
+            document.getElementById('order-success-modal').classList.remove('hidden');
+        }
+
+        function closeOrderSuccessModal() {
+            document.getElementById('order-success-modal').classList.add('hidden');
+        }
+
         // ==================== KITCHEN ACTION CONTROLLERS ====================
 
         async function updateOrderStatus(orderId, nextStatus) {
@@ -1579,12 +1594,16 @@
             if (IS_SIMULATION) {
                 const oIdx = localOrders.findIndex(o => o.order_id === targetId);
                 if (oIdx !== -1) {
+                    // Update status to cancelled locally
                     localOrders[oIdx].status = 'cancelled';
-                    renderAll();
+                    renderKitchenDashboard();
+                    renderCashierGrid();
+                    updateUnpaidBadge();
                     showToast(`🛑 ยกเลิกออเดอร์ #${targetId} สำเร็จแล้ว`, "🟢");
                 }
             } else {
                 try {
+                    // Push updated status directly to Apps Script API
                     await fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
@@ -1597,7 +1616,7 @@
 
                     setTimeout(async () => {
                         await syncWithGoogleSheet();
-                        showToast(`🛑 ยกเลิกออเดอร์ #${targetId} ใน Google Sheets สำเร็จ!`, "🟢");
+                        showToast(`🛑 ยกเลิกออเดอร์ #${targetId} และบันทึกลง Google Sheets แล้ว!`, "🟢");
                     }, 1200);
 
                 } catch (err) {
@@ -1607,7 +1626,7 @@
             }
         }
 
-        // ==================== CASHIER ACTION CONTROLLERS & CALCULATORS ====================
+        // ==================== CASHIER ACTION CONTROLLERS & PROFESSIONAL CALCULATORS ====================
 
         function openBillingModal(tableCode) {
             const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid' && o.status !== 'cancelled');
@@ -1748,7 +1767,7 @@
                     sessionStorage.removeItem(`alert_${tCode}`);
                     closeBillingModal();
                     renderAll();
-                    showToast(`💰 โต๊ะ ${tCode} เคลียร์ยอดบิลสำเร็จ! ขอบคุณที่มาใช้บริการครับ`, "🟢");
+                    showToast("💰 เช็คบิลเรียบร้อย ขอบพระคุณครับ", "🟢");
                     payBtn.disabled = false;
                     payBtn.innerText = "💰 รับชำระเงินและปิดรอบ";
                 }, 800);
@@ -1823,4 +1842,3 @@
     </script>
 </body>
 </html>
-```eof
