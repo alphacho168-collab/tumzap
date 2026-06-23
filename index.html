@@ -40,7 +40,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- VIEW CONTAINER: Wraps between Customer Mode and Backoffice Mode -->
     <div id="app-wrapper" class="max-w-7xl mx-auto p-4 md:p-6">
         
         <!-- ==================== 📱 CUSTOMER VIEW (ONLY SHOWS THIS BY DEFAULT) ==================== -->
@@ -60,17 +59,24 @@
                             <p class="text-[11px] text-orange-100 font-light">รสเด็ด แซ่บนัว ส่งตรงถึงโต๊ะคุณ</p>
                         </div>
                     </div>
-                    <!-- Select Table / Service Options -->
-                    <div class="relative">
-                        <select id="client-table-select" onchange="handleClientTableChange()" class="bg-black/20 hover:bg-black/30 text-white font-bold text-xs py-2 px-3 rounded-xl border border-white/20 focus:outline-none cursor-pointer">
-                            <option value="A01">โต๊ะ A01</option>
-                            <option value="A02" selected>โต๊ะ A02</option>
-                            <option value="A03">โต๊ะ A03</option>
-                            <option value="A04">โต๊ะ A04</option>
-                            <option value="A05">โต๊ะ A05</option>
-                            <option value="Takeaway">🥡 กลับบ้าน (Takeaway)</option>
-                            <option value="Delivery">🛵 เดลิเวอรี่ (Delivery)</option>
-                        </select>
+                    
+                    <!-- Right Actions in Header (Table selector + Subtle Staff Key) -->
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <select id="client-table-select" onchange="handleClientTableChange()" class="bg-black/20 hover:bg-black/30 text-white font-bold text-xs py-2 px-3 rounded-xl border border-white/20 focus:outline-none cursor-pointer">
+                                <option value="A01">โต๊ะ A01</option>
+                                <option value="A02" selected>โต๊ะ A02</option>
+                                <option value="A03">โต๊ะ A03</option>
+                                <option value="A04">โต๊ะ A04</option>
+                                <option value="A05">โต๊ะ A05</option>
+                                <option value="Takeaway">🥡 กลับบ้าน (Takeaway)</option>
+                                <option value="Delivery">🛵 เดลิเวอรี่ (Delivery)</option>
+                            </select>
+                        </div>
+                        <!-- Subtle Staff Key Button at the top header -->
+                        <button onclick="openLoginModal()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center text-sm shadow-sm" title="เข้าระบบหลังบ้านสำหรับพนักงาน">
+                            🔑
+                        </button>
                     </div>
                 </div>
                 
@@ -477,7 +483,7 @@
     <!-- CORE LOGIC SCRIPTS -->
     <script>
         // ==================== SYSTEM & API CONFIGURATION ====================
-        // โหมดเชื่อมต่อ API จริง: ตั้งค่าเป็น false เพื่อเริ่มรันข้อมูลจากกูเกิลชีท
+        // โหมดเชื่อมต่อ API จริง: ตั้งค่าเป็น false เพื่อเริ่มรันข้อมูลจากกูเกิลชีทจริง
         let IS_SIMULATION = false; 
         
         // ลิงก์ Apps Script API URL ของคุณ Get Patradit
@@ -610,6 +616,8 @@
                 if (!response.ok) throw new Error("API Connection Failed");
                 const data = await response.json();
                 
+                // CRITICAL ROBUST FALLBACK CHECK: If data.success is false (e.g. some spreadsheet tab errors),
+                // we still want to trigger fallback rendering so the customer screen is NEVER blank.
                 if (data.success || data.status === "success") {
                     if (data.categories && data.categories.length > 0) localCategories = data.categories;
                     if (data.menu && data.menu.length > 0) localMenu = data.menu;
@@ -638,20 +646,12 @@
                             });
                         });
                     }
-
-                    renderClientCategories();
-                    renderClientMenuItems();
-                    renderKitchenDashboard();
-                    renderCashierGrid();
-                    updateUnpaidBadge();
-                    if (activeClientTab === "track") {
-                        renderClientTrackingList();
-                    }
-                    if (activeTableForBill) {
-                        renderBillingModalDetails(activeTableForBill);
-                    }
                     // Hide warning box on successful connection
                     document.getElementById('db-diagnostic-box').classList.add('hidden');
+                } else {
+                    console.warn("Apps Script success returned false. Falling back to local template data.", data.error);
+                    // Show warning diagnostic instructions box
+                    document.getElementById('db-diagnostic-box').classList.remove('hidden');
                 }
             } catch (err) {
                 console.error("Error fetching sheet data:", err);
@@ -659,12 +659,19 @@
                 
                 // Show diagnostic instructions box
                 document.getElementById('db-diagnostic-box').classList.remove('hidden');
-
-                // Use local data silently
+            } finally {
+                // ALWAYS render the menu so the UI is NEVER empty for the client!
                 renderClientCategories();
                 renderClientMenuItems();
                 renderKitchenDashboard();
                 renderCashierGrid();
+                updateUnpaidBadge();
+                if (activeClientTab === "track") {
+                    renderClientTrackingList();
+                }
+                if (activeTableForBill) {
+                    renderBillingModalDetails(activeTableForBill);
+                }
             }
         }
 
@@ -1549,6 +1556,20 @@
             showToast(clientConfirmationMsg, "🔔");
             sessionStorage.setItem(`alert_${currentClientTable}`, alertType);
             renderCashierGrid();
+        }
+
+        function showToast(text, icon = "🌶️") {
+            const toast = document.getElementById('toast-message');
+            document.getElementById('toast-icon').innerText = icon;
+            document.getElementById('toast-text').innerText = text;
+
+            toast.classList.remove('hidden');
+            toast.style.transform = "translate(-50%, -20px)";
+
+            setTimeout(() => {
+                toast.style.transform = "translate(-50%, 0px)";
+                toast.classList.add('hidden');
+            }, 3000);
         }
 
     </script>
