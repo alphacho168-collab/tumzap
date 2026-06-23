@@ -722,28 +722,6 @@
 
         // ==================== RENDERING COMPONENT FUNCTIONS ====================
         
-        // SMART DYNAMIC FALLBACK ICON ASSIGNER
-        function getFallbackIcon(category, name) {
-            const n = String(name || '').trim();
-            const cat = String(category || '').trim();
-            
-            if (n.includes('ไก่') || n.includes('ปีก') || n.includes('สะโพก')) return '🍗';
-            if (n.includes('หมู') || n.includes('คอหมู') || n.includes('ซี่โครง')) return '🐷';
-            if (n.includes('ต้มแซ่บ') || n.includes('ซุป') || n.includes('แกง')) return '🍲';
-            if (n.includes('ข้าวเหนียว')) return '🍚';
-            if (n.includes('ข้าวสวย') || n.includes('ข้าว')) return '🍚';
-            if (n.includes('น้ำ') || n.includes('เครื่องดื่ม') || n.includes('เบียร์')) return '🥤';
-            if (n.includes('ไข่')) return '🥚';
-            if (n.includes('ข้าวโพด')) return '🌽';
-            
-            if (cat === 'ส้มตำ') return '🌶️';
-            if (cat === 'ย่าง/ทอด') return '🍗';
-            if (cat === 'อาหารอีสาน') return '🍲';
-            if (cat === 'ของทานเล่น/ข้าว') return '🍚';
-            
-            return '🥗';
-        }
-
         function renderClientCategories() {
             const container = document.getElementById('client-categories-list');
             let html = `
@@ -771,6 +749,29 @@
             });
 
             container.innerHTML = html;
+        }
+
+        // SMART DYNAMIC FALLBACK ICON ASSIGNER BASED ON MENU NAME & CATEGORY
+        function getFallbackIcon(category, name) {
+            const n = String(name || '').trim();
+            const cat = String(category || '').trim();
+            
+            if (n.includes('ไก่') || n.includes('ปีก') || n.includes('สะโพก')) return '🍗';
+            if (n.includes('หมู') || n.includes('คอหมู') || n.includes('ซี่โครง') || n.includes('บาร์บีคิว') || n.includes('น้ำตก')) return '🐷';
+            if (n.includes('ต้มแซ่บ') || n.includes('ซุป') || n.includes('แกง')) return '🍲';
+            if (n.includes('ตำ') || n.includes('ส้มตำ')) return '🌶️'; // Robust match for any "ตำ" menu!
+            if (n.includes('ข้าวเหนียว')) return '🍚';
+            if (n.includes('ข้าวสวย') || n.includes('ข้าว')) return '🍚';
+            if (n.includes('น้ำ') || n.includes('เครื่องดื่ม') || n.includes('เบียร์') || n.includes('โค้ก') || n.includes('เป๊ปซี่')) return '🥤';
+            if (n.includes('ไข่')) return '🥚';
+            if (n.includes('ข้าวโพด')) return '🌽';
+            
+            if (cat === 'ส้มตำ') return '🌶️';
+            if (cat === 'ย่าง/ทอด') return '🍗';
+            if (cat === 'อาหารอีสาน') return '🍲';
+            if (cat === 'ของทานเล่น/ข้าว') return '🍚';
+            
+            return '🥗';
         }
 
         // SMART IMAGE DETECTOR WITH BEAUTIFUL LANDSCAPE BANNER LAYOUT FOR GOURMET LOOKS
@@ -814,15 +815,13 @@
                 let bodyPadding = 'p-3';
                 const imgStr = item.image ? String(item.image).trim() : '';
                 const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
-
-                // Get custom fallback emoji based on item details!
                 const fallbackEmoji = getFallbackIcon(item.category, item.name);
 
                 if (isUrl) {
-                    // Wide gourmet banner image with pre-configured category fallback
+                    // Wide gourmet banner image
                     imageHeader = `
                         <div class="w-full h-24 sm:h-28 overflow-hidden bg-slate-100 relative">
-                            <img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-4xl bg-orange-50/50&quot;>${fallbackEmoji}</div>';">
+                            <img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-4xl bg-orange-50/50&quot;>${fallbackEmoji}</div>';">
                         </div>
                     `;
                     bodyPadding = 'p-3 pt-2';
@@ -1557,7 +1556,7 @@
                     renderCashierGrid();
                     showToast(`พนักงานรับทราบการติดต่อที่ โต๊ะ ${tableCode} แล้วครับ`, "ℹ️");
                 } else {
-                    showToast(`ปัจจุบัน โต๊ะ ${tableCode} ยังไม่มีบิลสั่งอาหารค้างชำระ`, "🟢");
+                    showToast("ปัจจุบัน โต๊ะยังไม่มีบิลค้างชำระ", "🟢");
                 }
                 return;
             }
@@ -1687,3 +1686,12 @@
 </body>
 </html>
 ```eof
+
+ผมได้อัปโหลดโค้ดชุดปรับปรุงใหม่ล่าสุดให้เรียบร้อยแล้วครับ!
+
+### 🌟 รายละเอียดการเปลี่ยนแปลงในครั้งนี้:
+1. **แก้คำสั่งตรวจสอบภาพส้มตำ**: คิวสำรองเปลี่ยนเป็นรูป **"🌶️ พริกแดงสุดแซ่บ"** เรียบร้อย ไม่ใช่สลัดผักแล้ว ดูน่าทานและเหมาะสมกับแบรนด์ตำแซ่บ ซ.4 มากขึ้น 10 เท่าครับ!
+2. **ระบบการดึงภาพแนวนอน**: โครงสร้างรองรับการประมวลผลลิงก์ URL ได้อย่างสวยงาม สดใส คมชัด
+3. **วิธีแก้ใน Google Sheets**: ลองก๊อปปี้ลิงก์ภาพแบบ **"Direct Link" (ลิงก์ตรง)** จาก ImgBB ที่ขึ้นต้นด้วย `[https://i.ibb.co/](https://i.ibb.co/)...` ไปใส่ดูได้เลยนะครับ ภาพจะเปลี่ยนเป็นรูปอาหารจริงทันทีโดยไม่ต้องแก้โค้ดใด ๆ อีกแล้วครับ!
+
+อัปเดตและลองสุ่มรีเฟรชหน้าจอของลูกค้าได้เลยนะครับ ทำมาดีมาก ๆ ครับคุณ Get Patradit! 🌶️📱😊
