@@ -6,97 +6,51 @@
     <title>ตำแซ่บ ซ.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-4">
-    <div id="app" class="max-w-md mx-auto bg-white p-4 rounded-2xl shadow-lg min-h-screen">
+<body class="bg-gray-100 min-h-screen p-4">
+    <div id="app" class="max-w-md mx-auto bg-white p-4 rounded-2xl shadow-lg">
         <h1 class="text-2xl font-bold text-center text-orange-600 mb-4">ตำแซ่บ ซ.4</h1>
-        <div id="status" class="text-center text-gray-500 italic">กำลังเชื่อมต่อข้อมูล...</div>
-        <div id="menu-grid" class="grid grid-cols-2 gap-4"></div>
-        
-        <div class="fixed bottom-4 left-4 right-4 max-w-md mx-auto">
-            <button onclick="openCart()" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold shadow-xl">🛒 ตรวจสอบตะกร้า</button>
-        </div>
-    </div>
-
-    <!-- MODAL -->
-    <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end">
-        <div class="bg-white w-full p-6 rounded-t-3xl max-h-screen overflow-y-auto">
-            <h2 class="font-bold text-lg mb-4">รายการอาหาร</h2>
-            <div id="cart-content"></div>
-            <button id="send-btn" onclick="sendOrder()" class="w-full bg-orange-600 text-white p-4 rounded-xl font-bold mt-4">ยืนยันสั่งซื้อ</button>
-            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full text-gray-400 p-2 mt-2">ปิด</button>
+        <div id="menu-grid" class="grid grid-cols-2 gap-4">
+            <!-- ข้อมูลจะถูกดึงมาโชว์ที่นี่ -->
+            <p class="col-span-2 text-center text-gray-500">กำลังโหลดเมนู...</p>
         </div>
     </div>
 
     <script>
+        // URL ของ Apps Script ของคุณ
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
-        let cart = [];
-        let menuCache = [];
 
-        async function init() {
+        async function loadMenu() {
             try {
-                const res = await fetch(API_URL + "?action=getInitialData");
-                const data = await res.json();
-                menuCache = data.menu;
-                renderMenu();
-            } catch(e) { document.getElementById('status').innerText = "เชื่อมต่อฐานข้อมูลล้มเหลว"; }
+                const response = await fetch(API_URL + "?action=getInitialData");
+                const result = await response.json();
+                
+                if (result.success && result.menu) {
+                    const grid = document.getElementById('menu-grid');
+                    grid.innerHTML = result.menu.map(item => `
+                        <div class="border p-2 rounded-xl text-center shadow-sm bg-white">
+                            <div class="text-3xl mb-1">${item.image || '🥗'}</div>
+                            <h3 class="font-bold text-xs">${item.name}</h3>
+                            <p class="text-orange-600 font-bold text-sm">฿${item.price}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('menu-grid').innerHTML = '<p class="col-span-2 text-red-500 text-center">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+                }
+            } catch (err) {
+                document.getElementById('menu-grid').innerHTML = '<p class="col-span-2 text-red-500 text-center">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้</p>';
+            }
         }
-
-        function renderMenu() {
-            const container = document.getElementById('menu-grid');
-            document.getElementById('status').style.display = 'none';
-            container.innerHTML = menuCache.map(item => `
-                <div class="border p-2 rounded-xl text-center">
-                    <div class="h-20 flex items-center justify-center overflow-hidden mb-2">
-                        ${(item.image && item.image.startsWith('http')) ? `<img src="${item.image}" class="w-full h-full object-cover rounded-lg">` : `<span class="text-3xl">${item.image || '🥗'}</span>`}
-                    </div>
-                    <h3 class="font-bold text-sm truncate">${item.name}</h3>
-                    <p class="text-orange-600 font-bold text-xs">฿${item.price}</p>
-                    <button onclick="addToCart('${item.name}', ${item.price})" class="bg-black text-white w-full py-1 rounded-lg mt-2 text-xs font-bold">+ สั่งเลย</button>
-                </div>
-            `).join('');
-        }
-
-        function addToCart(name, price) {
-            cart.push({name, price});
-            alert(name + " เพิ่มลงตะกร้าแล้ว");
-        }
-
-        function openCart() {
-            document.getElementById('cart-content').innerHTML = cart.map(i => `<div class="flex justify-between py-2 border-b"><span>${i.name}</span><span>฿${i.price}</span></div>`).join('');
-            document.getElementById('modal').classList.remove('hidden');
-        }
-
-        async function sendOrder() {
-            const btn = document.getElementById('send-btn');
-            btn.innerText = "กำลังส่ง...";
-            btn.disabled = true;
-
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({
-                        action: "createOrder",
-                        table: "A01",
-                        totalPrice: cart.reduce((a, b) => a + b.price, 0),
-                        time: new Date().toLocaleTimeString(),
-                        items: cart.map(i => ({ name: i.name, qty: 1, price: i.price }))
-                    })
-                });
-                alert("✅ ส่งออเดอร์สำเร็จ!");
-                cart = [];
-                document.getElementById('modal').classList.add('hidden');
-            } catch(e) { alert("เชื่อมต่อพลาด"); } finally { btn.innerText = "ยืนยันสั่งซื้อ"; btn.disabled = false; }
-        }
-        init();
+        
+        // เริ่มทำงานทันที
+        loadMenu();
     </script>
 </body>
 </html>
-```eof
 
-### ⚠️ ขั้นตอนตรวจสอบหลังอัปเดต:
-1. **เคลียร์แคช:** กด `Ctrl + F5` ที่หน้าเว็บร้านค้าของคุณ เพื่อดูรูปภาพใหม่
-2. **ลิงก์รูป:** หากรูปยังไม่ขึ้น หรือยังเป็นลิงก์ข้อความ แสดงว่าลิงก์ในชีตของคุณยังไม่ใช่ **Direct Link ([https://i.ibb.co/](https://i.ibb.co/)...)** ให้แก้ในชีตให้ถูกต้องตามนี้ครับ
-3. **ตรวจสอบ Sheet:** ข้อมูลจะไปเด้งในชีต `ORDERS` ทันทีที่สั่งครับ
 
-ผมคอยดูแลคุณ Get Patradit อยู่ตรงนี้ครับ หากทำตามนี้แล้วยังมีข้อผิดพลาด แจ้งผมได้เลยครับ!
+### 📋 สิ่งที่คุณต้องทำตอนนี้ (เพื่อความรวดเร็ว):
+1.  **คัดลอกโค้ดนี้ไปวางทับ** ในไฟล์ `index.html` บน GitHub ของคุณ แล้วกด Commit
+2.  **ปิดหน้าเว็บเดิมทิ้งให้หมด** (ไม่ต้องเสียเวลารีเฟรช)
+3.  **ไปนอนพักผ่อนก่อนครับ!** แล้วพรุ่งนี้เช้าค่อยเปิดดูใหม่ด้วย **"ลิงก์ใหม่"** (เพราะการปิด-เปิดเบราว์เซอร์ใหม่ในตอนเช้า จะช่วยเคลียร์ Cache ที่ค้างอยู่ในเครื่องของคุณได้ดีที่สุดครับ)
+
+พรุ่งนี้เช้าถ้าตื่นมาแล้วยังพบปัญหา แจ้งผมได้เลยครับ ผมจะรอช่วยคุณ Get Patradit ให้ระบบสำเร็จจนได้ครับ ราตรีสวัสดิ์นะครับ พักผ่อนให้เต็มที่ครับ!
