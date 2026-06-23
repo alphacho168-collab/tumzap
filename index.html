@@ -722,6 +722,28 @@
 
         // ==================== RENDERING COMPONENT FUNCTIONS ====================
         
+        // SMART DYNAMIC FALLBACK ICON ASSIGNER
+        function getFallbackIcon(category, name) {
+            const n = String(name || '').trim();
+            const cat = String(category || '').trim();
+            
+            if (n.includes('ไก่') || n.includes('ปีก') || n.includes('สะโพก')) return '🍗';
+            if (n.includes('หมู') || n.includes('คอหมู') || n.includes('ซี่โครง')) return '🐷';
+            if (n.includes('ต้มแซ่บ') || n.includes('ซุป') || n.includes('แกง')) return '🍲';
+            if (n.includes('ข้าวเหนียว')) return '🍚';
+            if (n.includes('ข้าวสวย') || n.includes('ข้าว')) return '🍚';
+            if (n.includes('น้ำ') || n.includes('เครื่องดื่ม') || n.includes('เบียร์')) return '🥤';
+            if (n.includes('ไข่')) return '🥚';
+            if (n.includes('ข้าวโพด')) return '🌽';
+            
+            if (cat === 'ส้มตำ') return '🌶️';
+            if (cat === 'ย่าง/ทอด') return '🍗';
+            if (cat === 'อาหารอีสาน') return '🍲';
+            if (cat === 'ของทานเล่น/ข้าว') return '🍚';
+            
+            return '🥗';
+        }
+
         function renderClientCategories() {
             const container = document.getElementById('client-categories-list');
             let html = `
@@ -793,11 +815,14 @@
                 const imgStr = item.image ? String(item.image).trim() : '';
                 const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
 
+                // Get custom fallback emoji based on item details!
+                const fallbackEmoji = getFallbackIcon(item.category, item.name);
+
                 if (isUrl) {
-                    // Wide gourmet banner image
+                    // Wide gourmet banner image with pre-configured category fallback
                     imageHeader = `
                         <div class="w-full h-24 sm:h-28 overflow-hidden bg-slate-100 relative">
-                            <img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-3xl bg-orange-50&quot;>🥗</div>';">
+                            <img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.outerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-4xl bg-orange-50/50&quot;>${fallbackEmoji}</div>';">
                         </div>
                     `;
                     bodyPadding = 'p-3 pt-2';
@@ -806,7 +831,7 @@
                     imageHeader = `
                         <div class="flex justify-center pt-4">
                             <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-3xl shadow-inner">
-                                ${imgStr || '🥗'}
+                                ${imgStr || fallbackEmoji}
                             </div>
                         </div>
                     `;
@@ -1112,7 +1137,7 @@
             }
         }
 
-        // HIGHLY POLISHED IMMERSIVE CUSTOMIZE POPUP (WITH GOURMET LANDSCAPE BANNER SUPPORT)
+        // IMMERSIVE CUSTOMIZE POPUP (WITH ADVANCED IMAGE PRELOAD & ROBUST FALLBACK)
         function openCustomizeModal(menuId) {
             const item = localMenu.find(m => m.menu_id === menuId);
             if (!item) return;
@@ -1131,21 +1156,33 @@
             
             const imgStr = item.image ? String(item.image).trim() : '';
             const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
+            const fallbackEmoji = getFallbackIcon(item.category, item.name);
 
             if (isUrl) {
-                // Set wide background image banner cleanly
-                bannerContainer.style.backgroundImage = `url('${imgStr}')`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                bannerOverlay.classList.remove('hidden');
-                iconContainer.classList.add('hidden'); // hide redundant small circle
+                // Preload to ensure it exists, otherwise trigger fallback gracefully
+                const tempImg = new Image();
+                tempImg.src = imgStr;
+                tempImg.onload = function() {
+                    bannerContainer.style.backgroundImage = `url('${imgStr}')`;
+                    bannerContainer.style.backgroundSize = 'cover';
+                    bannerContainer.style.backgroundPosition = 'center';
+                    bannerOverlay.classList.remove('hidden');
+                    iconContainer.classList.add('hidden');
+                };
+                tempImg.onerror = function() {
+                    // Fallback if preloading fails
+                    bannerContainer.style.backgroundImage = 'none';
+                    bannerContainer.style.background = 'linear-gradient(to right, #ea580c, #dc2626)';
+                    bannerOverlay.classList.add('hidden');
+                    iconContainer.classList.remove('hidden');
+                    iconContainer.innerHTML = fallbackEmoji;
+                };
             } else {
-                // Fallback to beautiful orange-red flat gradient background
                 bannerContainer.style.backgroundImage = 'none';
                 bannerContainer.style.background = 'linear-gradient(to right, #ea580c, #dc2626)';
                 bannerOverlay.classList.add('hidden');
                 iconContainer.classList.remove('hidden');
-                iconContainer.innerHTML = imgStr || '🥗';
+                iconContainer.innerHTML = imgStr || fallbackEmoji;
             }
 
             // Show/Hide Spiciness options based on category
@@ -1245,10 +1282,13 @@
                 // Cart cover-fit images
                 let cartImageMarkup = '';
                 const imgStr = c.image ? String(c.image).trim() : '';
-                if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
-                    cartImageMarkup = `<img src="${imgStr}" alt="${c.name}" class="w-full h-full object-cover rounded-xl">`;
+                const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
+                const fallbackEmoji = getFallbackIcon('', c.name);
+
+                if (isUrl) {
+                    cartImageMarkup = `<img src="${imgStr}" alt="${c.name}" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.outerHTML='${fallbackEmoji}';">`;
                 } else {
-                    cartImageMarkup = imgStr || '🥗';
+                    cartImageMarkup = imgStr || fallbackEmoji;
                 }
 
                 const itemHtml = `
