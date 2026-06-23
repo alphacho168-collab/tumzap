@@ -883,7 +883,7 @@
             if (filteredMenu.length === 0) {
                 filteredMenu = localMenu.filter(item => {
                     if (clientSelectedCategory !== "ทั้งหมด" && item.category !== clientSelectedCategory) return false;
-                    return true;
+                    return item.name && String(item.name).trim() !== '';
                 });
             }
 
@@ -1417,7 +1417,7 @@
             updateClientCartSummary();
         }
 
-        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (100% FIXED)
+        // SUBMIT ORDER TO SHEET WITH CORRECT & ROBUST PAYLOAD STRUCTURE (CORS HANG-PROOF & OPTIMISTIC UI)
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
 
@@ -1427,8 +1427,12 @@
             let totalSum = 0;
             cart.forEach(c => totalSum += (c.price * c.qty));
 
+            // Copy cart details for asynchronous execution thread (Safeguards against race conditions!)
+            const cartCopy = [...cart];
+            const tableCopy = currentClientTable;
+
             // Map and format items strictly matching Apps Script EXPECTED parameters
-            const formattedItemsForScript = cart.map(c => {
+            const formattedItemsForScript = cartCopy.map(c => {
                 const spicinessText = c.spiciness ? ` (${c.spiciness})` : '';
                 const noteText = c.notes ? ` [โน้ต: ${c.notes}]` : '';
                 return {
@@ -1438,40 +1442,17 @@
                 };
             });
 
-            // Ultimate Dual-Format Payload: Fits newer & older Apps Script triggers perfectly!
-            const postPayload = {
-                action: "createOrder",
-                table: currentClientTable,
-                totalPrice: totalSum,
-                time: orderTime,
-                items: formattedItemsForScript,
-
-                // Nested wrapper support as fallback
-                order: {
-                    order_id: orderId,
-                    table: currentClientTable,
-                    items: formattedItemsForScript.map(i => `${i.name} x${i.qty}`).join(", "),
-                    total: totalSum,
-                    status: 'new',
-                    time: orderTime
-                }
-            };
-
-            const submitBtn = document.getElementById('submit-order-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "⏳ กำลังส่งอาหารเข้าคิวห้องครัว...";
-
             // 1. UPDATE LOCAL ENGINE INSTANTLY (Optimistic UI Update!)
             const localOrderMock = {
                 order_id: orderId,
-                table: currentClientTable,
+                table: tableCopy,
                 items: formattedItemsForScript.map(i => `${i.name} x${i.qty}`).join(", "),
                 total: totalSum,
                 status: 'new',
                 time: orderTime
             };
             
-            const localItemsMock = cart.map(c => ({
+            const localItemsMock = cartCopy.map(c => ({
                 order_id: orderId,
                 menu: `${c.name}${c.spiciness ? ' ('+c.spiciness+')' : ''}${c.notes ? ' ['+c.notes+']' : ''}`,
                 qty: c.qty,
@@ -1480,24 +1461,43 @@
                 notes: c.notes || ""
             }));
 
-            // Force local array merge instantly! This guarantees instant render in split tabs!
+            // Push locally for same-window updates and persist
             localOrders.push(localOrderMock);
             localOrderItems.push(...localItemsMock);
-            
-            // 2. IMMEDIATE Snappy Transition (Do not make the customer wait on the spinner!)
+            localStorage.setItem('tumzap_orders', JSON.stringify(localOrders));
+            localStorage.setItem('tumzap_order_items', JSON.stringify(localOrderItems));
+
+            // 2. IMMEDIATE Snappy Transition (Do not make the customer wait on network/CORS lag!)
             cart = [];
             updateClientCartSummary();
             closeCartModal();
-            openOrderSuccessModal(currentClientTable, totalSum);
+            openOrderSuccessModal(tableCopy, totalSum);
             switchClientTab('track');
             renderAll(); // Instantly update UI
 
             // Reset submit button state
+            const submitBtn = document.getElementById('submit-order-btn');
             submitBtn.disabled = false;
             submitBtn.innerHTML = `🔥 ยืนยันคำสั่งซื้อส่งห้องครัว`;
 
             // 3. SILENT BACKGROUND ASYNCHRONOUS POST
             if (!IS_SIMULATION) {
+                const postPayload = {
+                    action: "createOrder",
+                    table: tableCopy,
+                    totalPrice: totalSum,
+                    time: orderTime,
+                    items: formattedItemsForScript,
+                    order: {
+                        order_id: orderId,
+                        table: tableCopy,
+                        items: formattedItemsForScript.map(i => `${i.name} x${i.qty}`).join(", "),
+                        total: totalSum,
+                        status: 'new',
+                        time: orderTime
+                    }
+                };
+
                 // Execute the post request in the background, fully insulated from the UI thread!
                 fetch(API_URL, {
                     method: "POST",
@@ -1583,11 +1583,8 @@
             if (IS_SIMULATION) {
                 const oIdx = localOrders.findIndex(o => o.order_id === targetId);
                 if (oIdx !== -1) {
-                    // Update status to cancelled locally
                     localOrders[oIdx].status = 'cancelled';
-                    renderKitchenDashboard();
-                    renderCashierGrid();
-                    updateUnpaidBadge();
+                    renderAll();
                     showToast(`🛑 ยกเลิกออเดอร์ #${targetId} สำเร็จแล้ว`, "🟢");
                 }
             } else {
