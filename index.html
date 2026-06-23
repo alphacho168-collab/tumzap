@@ -40,7 +40,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- STREAMING_CHUNK: Setting up the main app wrapper container... -->
     <div id="app-wrapper" class="max-w-7xl mx-auto p-4 md:p-6">
         
         <!-- ==================== 📱 CUSTOMER VIEW (ONLY SHOWS THIS BY DEFAULT) ==================== -->
@@ -279,7 +278,6 @@
 
     <!-- ==================== MODALS & POPUPS ==================== -->
 
-    <!-- STREAMING_CHUNK: Setting up modals like login, customization spiciness and cart overlays... -->
     <!-- 🔐 STAFF LOGIN MODAL (PASSWORD: zaq123) -->
     <div id="login-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
@@ -747,6 +745,7 @@
             container.innerHTML = html;
         }
 
+        // SMART IMAGE DETECTOR (ROBUST URL / EMOJI SYNC)
         function renderClientMenuItems() {
             const container = document.getElementById('client-food-grid');
             container.innerHTML = '';
@@ -782,11 +781,23 @@
                     statusBadge = `<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">❌ วันนี้หมด</span>`;
                 }
 
+                // SMART RENDER DETECTOR: Checks if 'image' is a URL or a text/emoji
+                let imageMarkup = '';
+                const imgStr = item.image ? String(item.image).trim() : '';
+                if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
+                    imageMarkup = `<img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover rounded-2xl" onerror="this.onerror=null; this.parentElement.innerHTML='🥗';">`;
+                } else {
+                    imageMarkup = imgStr || '🥗';
+                }
+
                 const cardHtml = `
                     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-250 overflow-hidden relative flex flex-col justify-between ${disabledMarkup}">
                         ${statusBadge}
                         <div class="p-4 flex flex-col items-center text-center">
-                            <span class="text-4xl bg-orange-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-3">${item.image || '🥗'}</span>
+                            <!-- Image/Emoji Container with overflow hidden -->
+                            <div class="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-3 overflow-hidden text-3xl">
+                                ${imageMarkup}
+                            </div>
                             <h4 class="font-bold text-slate-800 text-sm mb-1">${item.name}</h4>
                             <p class="text-[10px] text-slate-400 line-clamp-2 h-7 overflow-hidden mb-3">${item.desc || 'สูตรแซ่บจัดจ้านเอกลักษณ์ของร้าน'}</p>
                         </div>
@@ -1079,6 +1090,7 @@
             }
         }
 
+        // CUSTOMIZATION MODAL OPENER (SMART IMAGE HANDLER)
         function openCustomizeModal(menuId) {
             const item = localMenu.find(m => m.menu_id === menuId);
             if (!item) return;
@@ -1087,9 +1099,21 @@
             
             document.getElementById('modal-food-name').innerText = item.name;
             document.getElementById('modal-food-price').innerText = `฿${item.price}`;
-            document.getElementById('modal-food-icon').innerText = item.image || '🥗';
             document.getElementById('modal-food-notes').value = '';
             document.getElementById('modal-qty-text').innerText = '1';
+
+            // SMART IMAGE MODAL DISPATCHER
+            const modalIconContainer = document.getElementById('modal-food-icon');
+            let modalImageMarkup = '';
+            const imgStr = item.image ? String(item.image).trim() : '';
+            if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
+                modalImageMarkup = `<img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover rounded-2xl">`;
+                modalIconContainer.className = "text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden";
+            } else {
+                modalImageMarkup = imgStr || '🥗';
+                modalIconContainer.className = "text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center";
+            }
+            modalIconContainer.innerHTML = modalImageMarkup;
 
             // Show/Hide Spiciness options based on category
             const spicinessSection = document.getElementById('spiciness-section');
@@ -1172,6 +1196,7 @@
             document.getElementById('cart-modal').classList.add('hidden');
         }
 
+        // SMART BASKET IMAGE CONVERTER
         function renderCartItems() {
             const container = document.getElementById('cart-items-container');
             container.innerHTML = '';
@@ -1184,10 +1209,21 @@
                 const lineTotal = c.price * c.qty;
                 sumPrice += lineTotal;
 
+                // SMART IMAGE CONVERTER FOR BASKET
+                let cartImageMarkup = '';
+                const imgStr = c.image ? String(c.image).trim() : '';
+                if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
+                    cartImageMarkup = `<img src="${imgStr}" alt="${c.name}" class="w-full h-full object-cover rounded-xl">`;
+                } else {
+                    cartImageMarkup = imgStr || '🥗';
+                }
+
                 const itemHtml = `
                     <div class="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="text-2xl bg-orange-50 w-9 h-9 rounded-xl flex items-center justify-center">${c.image || '🥗'}</span>
+                            <div class="text-2xl bg-orange-50 w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden">
+                                ${cartImageMarkup}
+                            </div>
                             <div class="space-y-0.5">
                                 <h4 class="font-bold text-xs text-slate-800">${c.name}</h4>
                                 <div class="flex gap-1 items-center">
@@ -1560,6 +1596,7 @@
             renderCashierGrid();
         }
 
+        // TOAST MESSAGE SYSTEM
         function showToast(text, icon = "🌶️") {
             const toast = document.getElementById('toast-message');
             document.getElementById('toast-icon').innerText = icon;
