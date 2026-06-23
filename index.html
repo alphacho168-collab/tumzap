@@ -5,61 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตำแซ่บ ซ.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body{font-family:sans-serif;} .animate-fade{animation:fadeIn 0.5s;}</style>
 </head>
-<body class="bg-slate-100">
-    <div id="app" class="max-w-md mx-auto min-h-screen bg-white shadow-xl p-4">
-        <!-- HEADER -->
-        <div class="bg-orange-600 text-white p-4 rounded-2xl mb-4 text-center">
-            <h1 class="text-xl font-bold">ตำแซ่บ ซ.4</h1>
-            <p class="text-sm opacity-90">สั่งอาหารออนไลน์</p>
-        </div>
-        
-        <!-- MENU GRID -->
-        <div id="menu-container" class="grid grid-cols-2 gap-4">
-            <!-- เมนูจะโหลดมาโชว์ที่นี่ทันที -->
-        </div>
-
-        <!-- CART BUTTON -->
-        <button onclick="openCart()" class="fixed bottom-4 left-4 right-4 bg-green-600 text-white p-4 rounded-2xl font-bold text-lg shadow-lg">
-            🛒 ดูตะกร้าสินค้า
-        </button>
+<body class="bg-slate-50 min-h-screen">
+    <div id="app" class="max-w-md mx-auto min-h-screen bg-white shadow-2xl p-4">
+        <h1 class="text-2xl font-bold text-center mb-4 text-orange-600">ตำแซ่บ ซ.4</h1>
+        <div id="menu-grid" class="grid grid-cols-2 gap-4"></div>
+        <button onclick="openCart()" class="fixed bottom-4 left-4 right-4 bg-green-600 text-white p-4 rounded-2xl font-bold shadow-xl">🛒 ตรวจสอบตะกร้า</button>
     </div>
 
-    <!-- CART MODAL -->
-    <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <!-- MODAL -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-3xl w-full max-w-sm">
-            <h2 class="font-bold text-lg mb-4">รายการในตะกร้า</h2>
-            <div id="cart-list" class="mb-4"></div>
-            <button id="send-btn" onclick="sendOrder()" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold">ยืนยันคำสั่งซื้อ</button>
-            <button onclick="document.getElementById('cart-modal').classList.add('hidden')" class="w-full mt-2 text-gray-500 py-2">ปิด</button>
+            <h2 id="modal-title" class="font-bold mb-4">ตะกร้าของคุณ</h2>
+            <div id="cart-content"></div>
+            <button id="send-btn" onclick="sendOrder()" class="w-full bg-orange-600 text-white p-3 rounded-xl mt-4 font-bold">ยืนยันสั่งซื้อ</button>
+            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full text-gray-400 mt-2">ปิด</button>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
-        let menuItems = []; 
         let cart = [];
 
         async function init() {
             try {
                 const res = await fetch(API_URL + "?action=getInitialData");
                 const data = await res.json();
-                menuItems = data.menu;
-                renderMenu();
-            } catch(e) {
-                alert("กรุณาตรวจสอบการตั้งค่า Google Sheet");
+                renderMenu(data.menu);
+            } catch(e) { 
+                console.error(e); 
             }
         }
 
-        function renderMenu() {
-            const container = document.getElementById('menu-container');
-            container.innerHTML = menuItems.map(item => `
-                <div class="border p-2 rounded-xl text-center">
-                    <div class="text-2xl">${item.image || '🥗'}</div>
-                    <h3 class="font-bold text-sm">${item.name}</h3>
-                    <p class="text-orange-600 font-bold">฿${item.price}</p>
-                    <button onclick="addToCart('${item.name}', ${item.price})" class="bg-slate-900 text-white w-full py-1 rounded-lg mt-2 text-xs font-bold">+ เพิ่ม</button>
+        function renderMenu(menu) {
+            document.getElementById('menu-grid').innerHTML = menu.map(item => `
+                <div class="border p-3 rounded-2xl text-center">
+                    <div class="text-3xl">${item.image || '🥗'}</div>
+                    <div class="font-bold text-sm mt-2">${item.name}</div>
+                    <div class="text-orange-600 font-bold">฿${item.price}</div>
+                    <button onclick="addToCart('${item.name}', ${item.price})" class="bg-slate-900 text-white w-full py-2 mt-2 rounded-lg text-xs font-bold">+ สั่งเลย</button>
                 </div>
             `).join('');
         }
@@ -70,9 +54,10 @@
         }
 
         function openCart() {
-            const list = document.getElementById('cart-list');
-            list.innerHTML = cart.map(item => `<div class="flex justify-between text-sm"><span>${item.name}</span><span>฿${item.price}</span></div>`).join('');
-            document.getElementById('cart-modal').classList.remove('hidden');
+            document.getElementById('cart-content').innerHTML = cart.map((item, i) => 
+                `<div class="flex justify-between text-sm py-1 border-b"><span>${item.name}</span><span>฿${item.price}</span></div>`
+            ).join('');
+            document.getElementById('modal').classList.remove('hidden');
         }
 
         async function sendOrder() {
@@ -80,32 +65,29 @@
             btn.innerText = "กำลังส่ง...";
             btn.disabled = true;
 
-            const payload = {
-                action: "createOrder",
-                table: "A01",
-                totalPrice: cart.reduce((sum, item) => sum + item.price, 0),
-                time: new Date().toLocaleTimeString(),
-                items: cart.map(item => ({ name: item.name, qty: 1, price: item.price }))
-            };
-
             try {
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        action: "createOrder",
+                        table: "A01",
+                        totalPrice: cart.reduce((s, i) => s + i.price, 0),
+                        time: new Date().toLocaleTimeString(),
+                        items: cart.map(i => ({ name: i.name, qty: 1, price: i.price }))
+                    })
                 });
-                alert("ส่งออเดอร์สำเร็จ!");
+                alert("✅ ส่งออเดอร์เข้าครัวสำเร็จ!");
                 cart = [];
-                document.getElementById('cart-modal').classList.add('hidden');
+                document.getElementById('modal').classList.add('hidden');
             } catch(e) {
-                alert("ส่งข้อมูลขัดข้อง โปรดตรวจสอบสิทธิ์ Google Sheets");
+                alert("เกิดข้อผิดพลาด โปรดลองอีกครั้ง");
             } finally {
-                btn.innerText = "ยืนยันคำสั่งซื้อ";
+                btn.innerText = "ยืนยันสั่งซื้อ";
                 btn.disabled = false;
             }
         }
-
         init();
     </script>
 </body>
