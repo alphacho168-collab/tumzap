@@ -303,10 +303,16 @@
     <!-- 🌶️ CUSTOMIZER MODAL (SPICINESS & NOTES) -->
     <div id="customize-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden transform scale-95 transition-all duration-200">
-            <div class="relative bg-gradient-to-r from-orange-600 to-red-600 p-5 text-white">
-                <button onclick="closeCustomizeModal()" class="absolute top-5 right-5 text-white bg-black/10 hover:bg-black/20 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold">×</button>
-                <div class="flex items-center gap-3">
-                    <span id="modal-food-icon" class="text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center">🥗</span>
+            
+            <!-- GOURMET IMMERSIVE HEADER BANNER AREA -->
+            <div id="modal-banner-container" class="relative h-48 bg-gradient-to-r from-orange-600 to-red-600 flex items-end p-5 text-white bg-cover bg-center">
+                <button onclick="closeCustomizeModal()" class="absolute top-4 right-4 text-white bg-black/40 hover:bg-black/50 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold z-20 transition-all">×</button>
+                
+                <!-- Dark Overlay for image contrast -->
+                <div id="modal-banner-overlay" class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent z-10 hidden"></div>
+                
+                <div class="flex items-center gap-3.5 z-10 relative">
+                    <div id="modal-food-icon" class="text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0">🥗</div>
                     <div>
                         <h3 id="modal-food-name" class="font-extrabold text-base leading-tight">ชื่อเมนูอาหาร</h3>
                         <p id="modal-food-price" class="text-sm text-orange-100 font-bold">฿0</p>
@@ -745,7 +751,7 @@
             container.innerHTML = html;
         }
 
-        // SMART IMAGE DETECTOR (ROBUST URL / EMOJI SYNC)
+        // SMART IMAGE DETECTOR WITH BEAUTIFUL LANDSCAPE BANNER LAYOUT FOR GOURMET LOOKS
         function renderClientMenuItems() {
             const container = document.getElementById('client-food-grid');
             container.innerHTML = '';
@@ -782,29 +788,45 @@
                 }
 
                 // SMART RENDER DETECTOR: Checks if 'image' is a URL or a text/emoji
-                let imageMarkup = '';
+                let imageHeader = '';
+                let bodyPadding = 'p-3';
                 const imgStr = item.image ? String(item.image).trim() : '';
-                if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
-                    imageMarkup = `<img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover rounded-2xl" onerror="this.onerror=null; this.parentElement.innerHTML='🥗';">`;
+                const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
+
+                if (isUrl) {
+                    // Wide gourmet banner image
+                    imageHeader = `
+                        <div class="w-full h-24 sm:h-28 overflow-hidden bg-slate-100 relative">
+                            <img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-3xl bg-orange-50&quot;>🥗</div>';">
+                        </div>
+                    `;
+                    bodyPadding = 'p-3 pt-2';
                 } else {
-                    imageMarkup = imgStr || '🥗';
+                    // Small fitted fallback circle emoji
+                    imageHeader = `
+                        <div class="flex justify-center pt-4">
+                            <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-3xl shadow-inner">
+                                ${imgStr || '🥗'}
+                            </div>
+                        </div>
+                    `;
+                    bodyPadding = 'p-3 pt-1 text-center';
                 }
 
                 const cardHtml = `
                     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-250 overflow-hidden relative flex flex-col justify-between ${disabledMarkup}">
                         ${statusBadge}
-                        <div class="p-4 flex flex-col items-center text-center">
-                            <!-- Image/Emoji Container with overflow hidden -->
-                            <div class="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-3 overflow-hidden text-3xl">
-                                ${imageMarkup}
+                        <div>
+                            ${imageHeader}
+                            <div class="${bodyPadding} flex flex-col">
+                                <h4 class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-1">${item.name}</h4>
+                                <p class="text-[9px] sm:text-[10px] text-slate-400 line-clamp-2 h-7 sm:h-8 overflow-hidden mt-0.5 leading-tight">${item.desc || 'สูตรแซ่บจัดจ้านเอกลักษณ์ของร้าน'}</p>
                             </div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-1">${item.name}</h4>
-                            <p class="text-[10px] text-slate-400 line-clamp-2 h-7 overflow-hidden mb-3">${item.desc || 'สูตรแซ่บจัดจ้านเอกลักษณ์ของร้าน'}</p>
                         </div>
                         
-                        <div class="bg-slate-50 border-t border-slate-100 p-3 flex items-center justify-between">
-                            <span class="text-sm font-black text-slate-800">฿${item.price}</span>
-                            <button onclick="openCustomizeModal('${item.menu_id}')" class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1">
+                        <div class="bg-slate-50 border-t border-slate-100 p-2.5 sm:p-3 flex items-center justify-between">
+                            <span class="text-xs sm:text-sm font-black text-slate-800">฿${item.price}</span>
+                            <button onclick="openCustomizeModal('${item.menu_id}')" class="bg-orange-600 hover:bg-orange-700 text-white text-[10px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 rounded-lg shadow-sm transition-all flex items-center gap-1">
                                 + สั่งเลย
                             </button>
                         </div>
@@ -1090,7 +1112,7 @@
             }
         }
 
-        // CUSTOMIZATION MODAL OPENER (SMART IMAGE HANDLER)
+        // HIGHLY POLISHED IMMERSIVE CUSTOMIZE POPUP (WITH GOURMET LANDSCAPE BANNER SUPPORT)
         function openCustomizeModal(menuId) {
             const item = localMenu.find(m => m.menu_id === menuId);
             if (!item) return;
@@ -1102,18 +1124,29 @@
             document.getElementById('modal-food-notes').value = '';
             document.getElementById('modal-qty-text').innerText = '1';
 
-            // SMART IMAGE MODAL DISPATCHER
-            const modalIconContainer = document.getElementById('modal-food-icon');
-            let modalImageMarkup = '';
+            // REVOLUTIONARY GOURMET BANNER SWITCHER
+            const bannerContainer = document.getElementById('modal-banner-container');
+            const bannerOverlay = document.getElementById('modal-banner-overlay');
+            const iconContainer = document.getElementById('modal-food-icon');
+            
             const imgStr = item.image ? String(item.image).trim() : '';
-            if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
-                modalImageMarkup = `<img src="${imgStr}" alt="${item.name}" class="w-full h-full object-cover rounded-2xl">`;
-                modalIconContainer.className = "text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden";
+            const isUrl = imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.');
+
+            if (isUrl) {
+                // Set wide background image banner cleanly
+                bannerContainer.style.backgroundImage = `url('${imgStr}')`;
+                bannerContainer.style.backgroundSize = 'cover';
+                bannerContainer.style.backgroundPosition = 'center';
+                bannerOverlay.classList.remove('hidden');
+                iconContainer.classList.add('hidden'); // hide redundant small circle
             } else {
-                modalImageMarkup = imgStr || '🥗';
-                modalIconContainer.className = "text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center";
+                // Fallback to beautiful orange-red flat gradient background
+                bannerContainer.style.backgroundImage = 'none';
+                bannerContainer.style.background = 'linear-gradient(to right, #ea580c, #dc2626)';
+                bannerOverlay.classList.add('hidden');
+                iconContainer.classList.remove('hidden');
+                iconContainer.innerHTML = imgStr || '🥗';
             }
-            modalIconContainer.innerHTML = modalImageMarkup;
 
             // Show/Hide Spiciness options based on category
             const spicinessSection = document.getElementById('spiciness-section');
@@ -1196,7 +1229,7 @@
             document.getElementById('cart-modal').classList.add('hidden');
         }
 
-        // SMART BASKET IMAGE CONVERTER
+        // FITTED BANNER AND COVER THUMBNAILS FOR CART
         function renderCartItems() {
             const container = document.getElementById('cart-items-container');
             container.innerHTML = '';
@@ -1209,7 +1242,7 @@
                 const lineTotal = c.price * c.qty;
                 sumPrice += lineTotal;
 
-                // SMART IMAGE CONVERTER FOR BASKET
+                // Cart cover-fit images
                 let cartImageMarkup = '';
                 const imgStr = c.image ? String(c.image).trim() : '';
                 if (imgStr.startsWith('http') || imgStr.includes('/') || imgStr.includes('.')) {
@@ -1221,7 +1254,7 @@
                 const itemHtml = `
                     <div class="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5">
-                            <div class="text-2xl bg-orange-50 w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden">
+                            <div class="text-2xl bg-orange-50 w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
                                 ${cartImageMarkup}
                             </div>
                             <div class="space-y-0.5">
@@ -1378,7 +1411,7 @@
                     renderKitchenDashboard();
                     renderCashierGrid();
                     updateUnpaidBadge();
-                    showToast(`อัปเดตออเดอร์ #${orderId} แล้ว`, "🧑‍🍳");
+                    showToast("อัปเดตออเดอร์เรียบร้อยแล้ว", "🧑‍🍳");
                 }
             } else {
                 showToast("กำลังส่งสถานะใหม่เข้ากูเกิลชีท...", "⏳");
@@ -1396,7 +1429,7 @@
 
                     setTimeout(async () => {
                         await syncWithGoogleSheet();
-                        showToast(`อัปเดตออเดอร์ #${orderId} เข้ากูเกิลชีทแล้ว!`, "🧑‍🍳");
+                        showToast("อัปเดตออเดอร์เข้ากูเกิลชีทเรียบร้อย!", "🧑‍🍳");
                     }, 1200);
 
                 } catch (err) {
@@ -1596,7 +1629,6 @@
             renderCashierGrid();
         }
 
-        // TOAST MESSAGE SYSTEM
         function showToast(text, icon = "🌶️") {
             const toast = document.getElementById('toast-message');
             document.getElementById('toast-icon').innerText = icon;
