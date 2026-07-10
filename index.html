@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ตำแซ่บ ซ.4 - ระบบจัดการร้านอาหารออนไลน์</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans Thai & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans Thai', 'Inter', sans-serif; }
@@ -18,8 +20,10 @@
 
     <div id="app-wrapper" class="max-w-7xl mx-auto p-2 md:p-6">
         
+        <!-- ==================== 📱 CUSTOMER INTERFACE (หน้าฝั่งลูกค้า) ==================== -->
         <div id="customer-view-section" class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col h-[820px] relative">
             
+            <!-- BRAND HEADER -->
             <div class="bg-gradient-to-br from-orange-600 to-red-600 p-5 text-white shadow-lg relative">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
@@ -56,6 +60,7 @@
                 </div>
             </div>
 
+            <!-- PRODUCT DISPLAY AREA -->
             <div class="flex-1 overflow-y-auto p-4 bg-slate-50" id="client-view-content">
                 <div id="client-menu-subtab">
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-2" id="client-categories-list"></div>
@@ -73,6 +78,7 @@
                 </div>
             </div>
 
+            <!-- CART FLOAT SUMMARY -->
             <div id="client-floating-cart-bar" class="bg-white border-t border-slate-150 p-4 flex items-center justify-between shadow-2xl relative z-10">
                 <div>
                     <p class="text-xs text-slate-400">รายการในตะกร้า</p>
@@ -82,6 +88,7 @@
             </div>
         </div>
 
+        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE ==================== -->
         <div id="staff-view-section" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -95,6 +102,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- CASHIER & TABLES MAP -->
                 <div class="lg:col-span-5 space-y-6">
                     <div class="bg-white rounded-3xl p-5 border shadow-lg">
                         <h2 class="text-sm font-bold text-slate-900 mb-3">🖥️ สถานะโต๊ะและปุ่มเรียกเก็บเงิน (แคชเชียร์)</h2>
@@ -107,6 +115,7 @@
                     </div>
                 </div>
 
+                <!-- KITCHEN INCOMING QUEUE -->
                 <div class="lg:col-span-7 bg-white rounded-3xl p-5 border shadow-lg flex flex-col min-h-[500px]">
                     <div class="flex justify-between items-center pb-3 border-b mb-4">
                         <h2 class="text-sm font-bold text-slate-900">🍳 รายการสั่งอาหารรอทำในครัว</h2>
@@ -123,6 +132,9 @@
 
     </div>
 
+    <!-- ==================== DIALOG MODALS & POPUPS ==================== -->
+
+    <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4">
             <h3 class="font-extrabold text-base text-center">🔐 เข้าสู่ระบบหลังบ้าน</h3>
@@ -132,6 +144,7 @@
         </div>
     </div>
 
+    <!-- CUSTOMIZE MODAL -->
     <div id="customize-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden flex flex-col">
             <div id="modal-banner-container" class="h-40 bg-gradient-to-r from-orange-600 to-red-600 flex items-end p-5 text-white relative bg-cover bg-center">
@@ -171,14 +184,14 @@
         </div>
     </div>
 
+    <!-- CLIENT BASKET CART MODAL -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold text-xs flex justify-between items-center">
                 <span>🛒 รายการในตะกร้าอาหาร - โต๊ะ <span id="cart-table-badge">102</span></span>
                 <button onclick="closeCartModal()" class="text-lg">✕</button>
             </div>
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
-                </div>
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50"></div>
             <div class="p-4 border-t bg-white space-y-3">
                 <div class="flex justify-between text-xs font-bold text-slate-700">
                     <span>ยอดเงินรวมทั้งสิ้น:</span>
@@ -190,10 +203,11 @@
         </div>
     </div>
 
+    <!-- CASHIER BILLING MODAL -->
     <div id="billing-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
             <div class="p-4 bg-slate-900 text-white flex justify-between items-center font-bold text-xs">
-                <span>💵 สรุปยอดเงินปิดโต๊ะ: <span id="bill-table-title" class="bg-orange-600 px-2 py-0.5 rounded text-[11px]">102</span></span>
+                <span>💵 รายการเช็คบิลปิดรอบโต๊ะ - <span id="bill-table-title" class="bg-orange-600 px-2 py-0.5 rounded text-[11px]">102</span></span>
                 <button onclick="closeBillingModal()" class="text-base">✕</button>
             </div>
             <div class="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
@@ -235,20 +249,24 @@
         </div>
     </div>
 
+    <!-- CLIENT SUCCESS ANIMATION MODAL -->
     <div id="order-success-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4">
-            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mx-auto">✓</div>
+            <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mx-auto">✓</div>
             <h3 class="font-extrabold text-base text-slate-900">🔥 ส่งรายการสั่งอาหารสำเร็จแล้ว!</h3>
             <p class="text-xs text-slate-500">คิวอาหารส่งถึงหลังบ้านเรียบร้อย แม่ครัวกำลังเร่งปรุงอาหารไปเสิร์ฟให้ครับ</p>
             <button onclick="closeOrderSuccessModal()" class="w-full bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">ตกลง</button>
         </div>
     </div>
 
+    <!-- TOAST NOTIFIER -->
     <div id="toast-message" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 text-white text-xs py-2.5 px-5 rounded-full shadow-2xl z-50 flex items-center gap-2">
-        <span id="toast-icon">🌶 *</span> <span id="toast-text">ข้อความ...</span>
+        <span id="toast-icon">🌶️</span> <span id="toast-text">ข้อความ...</span>
     </div>
 
+    <!-- CORE LOGIC ARCHITECTURE -->
     <script>
+        let IS_SIMULATION = false; 
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
 
         let localCategories = [];
@@ -413,6 +431,7 @@
             document.getElementById('cart-total-price').innerText = p;
         }
 
+        // FIX HANG: ปรับปรุงฟังก์ชันเรนเดอร์สแกนสินค้าในตะกร้าไม่ให้ระบบพังชะงักตัวค้าง
         function openCartModal() {
             if(cart.length === 0) { showToast("ยังไม่ได้เลือกอาหารเลยครับ", "⚠️"); return; }
             document.getElementById('cart-table-badge').innerText = currentClientTable;
@@ -518,7 +537,7 @@
 
                 return `
                     <button onclick="openBillingModal('${t}')" class="border rounded-xl p-3 flex flex-col items-center justify-center text-center ${isEating ? 'bg-orange-50 border-orange-300 font-bold' : 'bg-white'}">
-                        <span class="text-xs">${t.startsWith('1') ? 'โต๊ะ '+t : t}</span>
+                        <span class="text-xs">โต๊ะ ${t}</span>
                         <span class="text-[10px] text-slate-400 mt-1">${isEating ? '฿'+sum : 'ว่าง'}</span>
                     </button>
                 `;
@@ -544,7 +563,7 @@
             });
 
             document.getElementById('bill-grand-total').innerText = grandTotal;
-            document.getElementById('promptpay-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${grandTotal}`;
+            document.getElementById('promptpay-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://promptpay.io/0999999999/${grandTotal}`;
             document.getElementById('billing-modal').classList.remove('hidden');
             selectPayMode('cash');
         }
