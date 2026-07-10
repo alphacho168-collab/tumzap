@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE (หน้าหลังบ้านพนักงาน) ==================== -->
+        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE ==================== -->
         <div id="staff-view-section" class="hidden space-y-6 animate-fade-in">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -281,11 +281,14 @@
         let selectedSpiciness = "เผ็ดน้อย";
 
         window.onload = function() {
+            // HARD BREAK FORCED RESETS: บังคับล้างค่าเก่าที่ติดบั๊กออกจาก Cache เบราว์เซอร์ทันทีที่เริ่มโปรแกรมใหม่
+            localStorage.removeItem('cached_orders');
+            localStorage.removeItem('cached_order_items');
+            
             try {
                 if(localStorage.getItem('cached_menu')) localMenu = JSON.parse(localStorage.getItem('cached_menu'));
-                if(localStorage.getItem('cached_orders')) localOrders = JSON.parse(localStorage.getItem('cached_orders'));
-                if(localStorage.getItem('cached_order_items')) localOrderItems = JSON.parse(localStorage.getItem('cached_order_items'));
             } catch(e) {}
+            
             renderAll();
             syncWithGoogleSheet();
             setInterval(syncWithGoogleSheet, 4000);
@@ -303,7 +306,6 @@
                     }
                     if (data.orders) {
                         localOrders = data.orders;
-                        localStorage.setItem('cached_orders', JSON.stringify(localOrders));
                         
                         localOrderItems = [];
                         localOrders.forEach(o => {
@@ -321,7 +323,6 @@
                                 });
                             });
                         });
-                        localStorage.setItem('cached_order_items', JSON.stringify(localOrderItems));
                     }
                 }
             } catch(e) {}
@@ -481,7 +482,7 @@
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({ action: "createOrder", table: savedTable, totalPrice: totalSum, time: orderTime, items: payloadItems })
+                    body: JSON.stringify({ action: "createOrder", table: savedTable, totalPrice: totalSum, total: totalSum, time: orderTime, items: payloadItems })
                 });
                 syncWithGoogleSheet();
             } catch(e) {}
@@ -490,7 +491,6 @@
         function renderKitchenDashboard() {
             const container = document.getElementById('kitchen-queue-container');
             if(!container) return;
-            // กรองเฉพาะออเดอร์ที่ยังมีสถานะดำเนินอยู่ ไม่ใช่ 'paid' หรือ 'cancelled' หรือ 'served' เพื่อเคลียร์ครัว
             const kitchenOrders = localOrders.filter(o => o.status === 'new' || o.status === 'cooking' || o.status === 'ready');
             document.getElementById('kitchen-count-badge').innerText = kitchenOrders.length;
             
@@ -506,16 +506,16 @@
 
                 let btn = '';
                 if(o.status === 'new') {
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking', this)" class="w-full bg-orange-600 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">👨‍🍳 เริ่มปรุง</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking')" class="w-full bg-orange-600 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">👨‍🍳 เริ่มปรุง</button>`;
                 } else if(o.status === 'cooking') {
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready', this)" class="w-full bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🔔 พร้อมเสิร์ฟ</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready')" class="w-full bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🔔 พร้อมเสิร์ฟ</button>`;
                 } else {
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'served', this)" class="w-full bg-slate-800 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🍽 เสิร์ฟแล้ว</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'served')" class="w-full bg-slate-800 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🍽 เสิร์ฟแล้ว</button>`;
                 }
 
                 return `
                     <div class="bg-white border rounded-xl p-3 space-y-2 shadow-xs">
-                        <div class="flex justify-between font-bold text-xs border-b pb-1"><span>#${o.order_id}</span><span class="bg-slate-950 text-white px-2 rounded">โต๊ะ ${o.table}</span></div>
+                        <div class="flex justify-between font-bold text-xs border-b pb-1"><span>#${o.order_id}</span><span class="bg-slate-900 text-white px-2 rounded">โต๊ะ ${o.table}</span></div>
                         <ul>${rows}</ul>
                         <div class="pt-1">${btn}</div>
                     </div>
@@ -523,27 +523,20 @@
             }).join('');
         }
 
-        // FIX: ซ่อมแซมปุ่มเริ่มปรุงค้าง โดยให้เปลี่ยนสถานะในหน่วยความจำทันที ไม่รอคิวเครือข่ายล็อกบราวเซอร์
-        function updateOrderStatus(orderId, status, buttonEl) {
-            if(buttonEl) { 
-                buttonEl.disabled = true; 
-                buttonEl.innerText = "⏳ บันทึกข้อมูล..."; 
-            }
-            
-            // เปลี่ยนค่าสถานะหน้าเว็บบรรทัดนี้ทันทีเพื่อย้ายการ์ดโดยไม่มีอาการค้าง
+        // HARD FIX: ปุ่มครัวจะไม่เกิดอาการค้างคำว่า "บันทึกข้อมูล..." อีกต่อไป เพราะเรายึดสลับ UI ทันทีโดยไม่รอสัญญาณตอบกลับ
+        function updateOrderStatus(orderId, status) {
             localOrders.forEach((o, i) => { 
                 if(String(o.order_id) === String(orderId)) localOrders[i].status = status; 
             }); 
             renderAll();
+            showToast("เปลี่ยนสถานะครัวสำเร็จแล้ว", "🟢");
             
             fetch(API_URL, { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) 
             }).then(() => {
-                setTimeout(() => { syncWithGoogleSheet(); }, 400);
-            }).catch(e => {
-                console.log("Spreadsheet deferred refresh.");
+                setTimeout(syncWithGoogleSheet, 500);
             });
         }
 
@@ -553,8 +546,7 @@
             const tableList = ["101", "102", "103", "104", "105", "Takeaway", "Delivery"];
             
             container.innerHTML = tableList.map(t => {
-                // กรองออเดอร์รายโต๊ะที่ค้างชำระ โดยรองรับทั้งคอลัมน์ totalPrice และ คอลัมน์ total จากสคริปต์
-                const active = localOrders.filter(o => String(o.table) === t && o.status !== 'paid' && o.status !== 'cancelled');
+                const active = localOrders.filter(o => String(o.table) === t && o.status !== 'paid' && o.status !== 'cancelled' && o.status !== 'served');
                 let sum = 0; 
                 active.forEach(o => sum += parseFloat(o.totalPrice || o.total || 0));
                 let isEating = active.length > 0 && sum > 0;
@@ -572,7 +564,7 @@
             activeTableForBill = table;
             document.getElementById('bill-table-title').innerText = table;
             
-            const activeOrders = localOrders.filter(o => String(o.table) === table && o.status !== 'paid' && o.status !== 'cancelled');
+            const activeOrders = localOrders.filter(o => String(o.table) === table && o.status !== 'paid' && o.status !== 'cancelled' && o.status !== 'served');
             const tbody = document.getElementById('billing-items-rows');
             tbody.innerHTML = '';
             let grandTotal = 0;
@@ -608,11 +600,10 @@
             document.getElementById('qr-payment-panel').classList.toggle('hidden', m !== 'qr');
         }
 
-        // FIXED COMPLETE CLEAR: ล้างข้อมูลอาเรย์โต๊ะที่ปิดบิลออกจากหน่วยความจำเบราว์เซอร์ทันที หน้าติดตามสถานะลูกค้าและแคชเชียร์จะว่างทันที 100%
+        // HARD FIX CLOSING: สั่งระเบิดคิวออเดอร์เก่าทิ้งจากฝั่งหน้าแอปทันทีเพื่อให้ตัดสถานะเป็น "ว่าง" ร้อยเปอร์เซ็นต์
         function payOffTableBill() {
             if (!activeTableForBill) return;
             const table = activeTableForBill;
-            const btn = document.getElementById('cashier-confirm-pay-btn');
             
             if (activePaymentMode === 'cash') {
                 const total = parseFloat(document.getElementById('bill-grand-total').innerText) || 0;
@@ -620,22 +611,19 @@
                 if (rec < total) { alert("กรุณารับเงินสดมาให้ครบถ้วนเพื่อปิดบิลครับ"); return; }
             }
 
-            // ทำลายค่าออเดอร์ของโต๊ะนี้ออกจากอาเรย์ภายในเว็บหน้าร้านและหลังบ้านทันที เพื่อรีเซ็ตสถานะเป็น "ว่าง"
+            // กวาดล้างข้อมูลออเดอร์ทั้งหมดของโต๊ะนี้ออกจากแอปทันที
             localOrders = localOrders.filter(o => String(o.table) !== String(table));
-            localStorage.setItem('cached_orders', JSON.stringify(localOrders));
             
             closeBillingModal(); 
             renderAll(); 
-            showToast(`💰 เคลียร์บิล โต๊ะ ${table} และออเดอร์ค้างสำเร็จ!`, "🟢");
+            showToast(`💰 เคลียร์บิล โต๊ะ ${table} กลับเป็นสถานะว่างแล้ว`, "🟢");
 
             fetch(API_URL, { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify({ action: "billTable", table: table }) 
             }).then(() => {
-                setTimeout(() => { syncWithGoogleSheet(); }, 600);
-            }).catch(e => {
-                console.error("Spreadsheet wipe loop executed.");
+                setTimeout(syncWithGoogleSheet, 500);
             });
         }
 
@@ -676,21 +664,22 @@
         }
 
         function filterClientCategory(cat) { clientSelectedCategory = cat; renderAll(); }
-        function openLoginModal() { document.getElementById('staff-password-input').value = ""; document.getElementById('login-modal').classList.remove('hidden'); }
+        function openLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
         function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
         function submitStaffLogin() { if(document.getElementById('staff-password-input').value === "zaq123") { closeLoginModal(); document.getElementById('customer-view-section').classList.add('hidden'); document.getElementById('staff-view-section').classList.remove('hidden'); renderAll(); } }
         function logoutStaff() { document.getElementById('staff-view-section').classList.add('hidden'); document.getElementById('customer-view-section').classList.remove('hidden'); }
         function handleClientTableChange() { currentClientTable = document.getElementById('client-table-select').value; document.getElementById('table-track-name').innerText = "โต๊ะ " + currentClientTable; renderAll(); }
         function updateUnpaidBadge() { const hasUnpaid = localOrders.some(o => String(o.table) === currentClientTable && o.status !== 'paid'); document.getElementById('unpaid-order-badge').classList.toggle('hidden', !hasUnpaid); }
         
-        // RE-ENGINEERED TRACKING: แก้ไขลอจิกหน้าติดตามสถานะฝั่งลูกค้าให้อัปเดตและเคลียร์สถานะออเดอร์ทันทีตามสถานะในครัว
         function renderClientTrackingList() {
             const container = document.getElementById('client-tracking-list');
             if(!container) return;
-            const activeOrders = localOrders.filter(o => String(o.table) === String(currentClientTable) && o.status !== 'paid' && o.status !== 'cancelled');
+            
+            // กรองเฉพาะออเดอร์ของโต๊ะตัวเองที่ยังทำไม่เสร็จ (ไม่รวมออเดอร์ที่เช็คบิลเสร็จสมบูรณ์แล้ว)
+            const activeOrders = localOrders.filter(o => String(o.table) === String(currentClientTable) && o.status !== 'paid' && o.status !== 'cancelled' && o.status !== 'served');
             
             if (activeOrders.length === 0) {
-                container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border text-slate-400 text-xs">🍽 ยังไม่มีรายการอาหารค้างเสิร์ฟสำหรับโต๊ะนี้ครับ</div>`;
+                container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border text-slate-400 text-xs">🌱 ทุกรายการเสิร์ฟเรียบร้อย ปิดรอบโต๊ะว่างแล้วครับ</div>`;
                 return;
             }
             
@@ -698,7 +687,6 @@
                 let stateText = '⏳ รับออเดอร์แล้ว', stateColor = 'bg-amber-100 text-amber-800';
                 if (o.status === 'cooking') { stateText = '🍳 กำลังปรุง'; stateColor = 'bg-orange-100 text-orange-800 animate-pulse'; }
                 else if (o.status === 'ready') { stateText = '🟢 พร้อมเสิร์ฟ'; stateColor = 'bg-green-100 text-green-800'; }
-                else if (o.status === 'served') { stateText = '✅ เสิร์ฟแล้ว'; stateColor = 'bg-blue-100 text-blue-800'; }
                 return `<div class="bg-white p-3 border rounded-xl text-xs flex justify-between items-center shadow-xs"><span>ออเดอร์ #${o.order_id}</span><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${stateColor}">${stateText}</span></div>`;
             }).join('');
         }
@@ -714,8 +702,6 @@
         }
         function closeOrderSuccessModal() { document.getElementById('order-success-modal').classList.add('hidden'); }
         function showToast(txt, icon="🌶️") { const toast = document.getElementById('toast-message'); document.getElementById('toast-icon').innerText = icon; document.getElementById('toast-text').innerText = txt; toast.classList.remove('hidden'); setTimeout(() => toast.classList.add('hidden'), 2500); }
-        function manualSync() { syncWithGoogleSheet(); showToast("ซิงค์ข้อมูลสำเร็จ", "🔄"); }
-        function getFallbackIcon(cat, name) { const n = String(name || ''); if (n.includes('ไก่')) return '🍗'; if (n.includes('หมู')) return '🐷'; if (n.includes('น้ำ') || n.includes('เครื่องดื่ม')) return '🥤'; return '🌶️'; }
     </script>
 </body>
 </html>
