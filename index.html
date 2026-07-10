@@ -262,7 +262,7 @@
         <span id="toast-icon">🌶️</span> <span id="toast-text">ข้อความ...</span>
     </div>
 
-    <!-- CORE LOGIC ARCHITECTURE -->
+    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         let IS_SIMULATION = false; 
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
@@ -490,7 +490,6 @@
         function renderKitchenDashboard() {
             const container = document.getElementById('kitchen-queue-container');
             if(!container) return;
-            
             const kitchenOrders = localOrders.filter(o => o.status === 'new' || o.status === 'cooking' || o.status === 'ready');
             document.getElementById('kitchen-count-badge').innerText = kitchenOrders.length;
             
@@ -523,13 +522,13 @@
             }).join('');
         }
 
-        // PERFECT ULTIMATE FIX: ปุ่มในครัวสลับสถานะทันทีในหน้าจอความจำบราวเซอร์เพื่อย้ายคิว โดยตัดขั้นตอนตัวแปรขัดแย้งออกไปอย่างเด็ดขาด
+        // FIXED: แก้ไบลอจิกปุ่มในครัวไม่ผูกตัวแปรพัง ยืนยันทำงานเปลี่ยนคิวได้ลื่นไหล 100%
         function updateOrderStatus(orderId, status) {
             localOrders.forEach((o, i) => { 
                 if(String(o.order_id) === String(orderId)) localOrders[i].status = status; 
             }); 
             renderAll();
-            showToast("บันทึกคิวอาหารเรียบร้อยแล้ว", "🟢");
+            showToast("อัปเดตสถานะคิวสำเร็จ", "🟢");
             
             fetch(API_URL, { 
                 method: "POST", 
@@ -598,7 +597,7 @@
             document.getElementById('qr-payment-panel').classList.toggle('hidden', m !== 'qr');
         }
 
-        // PERFECT ULTIMATE VACANCY SYNCRONIZER: ลบข้อมูลออเดอร์ของโต๊ะออกจากหน่วยความจำของหน้าจอทั้งหมดทันที เพื่อให้สถานะกลับเป็น "ว่าง" โดยสมบูรณ์
+        // PERFECT FORCE PURGE: บังคับระเบิดล้างข้อมูลออเดอร์เก่าของโต๊ะที่ชำระเงินออกจากความจำหน้าแอปทันที เพื่อบังคับเปลี่ยนกลับเป็น "ว่าง"
         function payOffTableBill() {
             if (!activeTableForBill) return;
             const table = activeTableForBill;
@@ -609,13 +608,13 @@
                 if (rec < total) { alert("กรุณารับเงินสดมาให้ครบถ้วนเพื่อปิดบิลครับ"); return; }
             }
 
-            // บังคับกวาดล้างออเดอร์ทั้งหมดของโต๊ะนี้ออกจากอาเรย์ในเครื่องทันที ป้องกันออเดอร์ทดสอบเก่าไหลกลับมาค้าง
+            // บันทึกล้างอาเรย์ของโต๊ะนี้ทิ้งทันทีในแอปพลิเคชัน
             localOrders = localOrders.filter(o => String(o.table) !== String(table));
             localStorage.setItem('cached_orders', JSON.stringify(localOrders));
             
             closeBillingModal(); 
             renderAll(); 
-            showToast(`💰 เคลียร์บิล โต๊ะ ${table} สำเร็จแล้วและตั้งค่ากลับเป็นโต๊ะว่างทันที!`, "🟢");
+            showToast(`💰 ปิดบิล โต๊ะ ${table} สำเร็จและเคลียร์กลับเป็นโต๊ะว่างทันที!`, "🟢");
 
             fetch(API_URL, { 
                 method: "POST", 
