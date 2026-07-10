@@ -228,7 +228,7 @@
             </div>
             <div class="p-3 bg-slate-50 border-t flex gap-2">
                 <button onclick="closeBillingModal()" class="flex-1 bg-white border py-2 rounded-xl text-xs font-bold">ปิดหน้าต่าง</button>
-                <button id="cashier-confirm-pay-btn" onclick="payOffTableBill()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-xl text-xs shadow-md">💰 รับชำระเงินและปิดโต๊ะ</button>
+                <button id="cashier-confirm-pay-btn" onclick="payOffTableBill()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-xl text-xs shadow-md">💰 บันทึกชำระเงินและปิดโต๊ะ</button>
             </div>
         </div>
     </div>
@@ -469,7 +469,6 @@
             } catch(e) {}
         }
 
-        // FIX HANG: ปรับโครงสร้างลูปและเพิ่มระบบป้องกันปุ่มครัวล็อกค้าง (Self-healing Buttons)
         function renderKitchenDashboard() {
             const container = document.getElementById('kitchen-queue-container');
             if(!container) return;
@@ -505,27 +504,31 @@
             }).join('');
         }
 
-        // IMPROVED: ซ่อมลอจิกการกดปรุงเสร็จส่งต่อสถานะให้ทำงานทันที ไม่ล็อกเบราว์เซอร์ค้าง
-        async function updateOrderStatus(orderId, status, buttonEl) {
-            if(buttonEl) { buttonEl.disabled = true; buttonEl.innerText = "⏳ บันทึกข้อมูล..."; }
+        // FIX: แก้ไขปุ่มในครัวค้างอัปเดต โดยให้สลับการทำงานทันทีและยิงเบื้องหลังโดยไม่ต้องรอ Callback (Optimistic Update)
+        function updateOrderStatus(orderId, status, buttonEl) {
+            if(buttonEl) { 
+                buttonEl.disabled = true; 
+                buttonEl.innerText = "⏳ บันทึกข้อมูล..."; 
+            }
             
-            // Local Memory Update Instantly
-            localOrders.forEach((o, i) => { if(String(o.order_id) === String(orderId)) localOrders[i].status = status; }); 
+            // อัปเดตข้อมูลในหน่วยความจำทันทีเพื่อให้หน้าจอเปลี่ยนสถานะโดยไม่ค้าง
+            localOrders.forEach((o, i) => { 
+                if(String(o.order_id) === String(orderId)) localOrders[i].status = status; 
+            }); 
             renderAll();
             
-            try {
-                await fetch(API_URL, { 
-                    method: "POST", 
-                    mode: "no-cors", 
-                    body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) 
-                });
-                setTimeout(() => { syncWithGoogleSheet(); }, 800);
-            } catch(e) {
-                console.error("Kitchen signal loop deferred.");
-            }
+            // ส่งข้อมูลไปยังชีทแบบ Background Async
+            fetch(API_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) 
+            }).then(() => {
+                setTimeout(() => { syncWithGoogleSheet(); }, 500);
+            }).catch(e => {
+                console.log("Network dynamic delayed.");
+            });
         }
 
-        // FIX MATRIX MAP: ปรับแต่งแคชเชียร์รายโต๊ะให้อ่านค่า totalPrice เพื่อเปลี่ยนสถานะโต๊ะสีส้มทันที
         function renderCashierGrid() {
             const container = document.getElementById('cashier-table-grid');
             if(!container) return;
@@ -567,6 +570,8 @@
             document.getElementById('bill-grand-total').innerText = grandTotal;
             document.getElementById('promptpay-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://promptpay.io/0999999999/${grandTotal}`;
             document.getElementById('billing-modal').classList.remove('hidden');
+            document.getElementById('cash-received-input').value = "";
+            document.getElementById('cash-change-amount').innerText = "0";
             selectPayMode('cash');
         }
 
@@ -584,8 +589,8 @@
             document.getElementById('qr-payment-panel').classList.toggle('hidden', m !== 'qr');
         }
 
-        // IMPROVED: รับยอดเงินสดปิดบิลสำเร็จ ล้างสถานะรายโต๊ะทันทีไม่แช่ค้างคอลัมน์สีส้มโชว์ซ้ำ
-        async function payOffTableBill() {
+        // FIX: แก้ไขปุ่มบันทึกชำระเงินค้างและโต๊ะไม่เคลียร์ โดยการล้างข้อมูลหน้าบ้านทันทีและปิดโมดอลทันที (Instant Vacancy Sync)
+        function payOffTableBill() {
             if (!activeTableForBill) return;
             const table = activeTableForBill;
             const btn = document.getElementById('cashier-confirm-pay-btn');
@@ -596,28 +601,25 @@
                 if (rec < total) { alert("กรุณารับเงินสดมาให้ครบถ้วนเพื่อปิดบิลครับ"); return; }
             }
 
-            btn.disabled = true; btn.innerText = "⏳ บันทึกปิดบิล...";
-            
-            // Instantly clear memory array on frontend client view (Instant vacancy reset!)
-            localOrders = localOrders.filter(o => String(o.table) !== table || o.status === 'paid');
+            // สั่งล้างข้อมูลรายโต๊ะในหน้าเว็บทันที โต๊ะจะกลับเป็น "ว่าง" ทันทีโดยไม่ค้างหน้าจอ
+            localOrders = localOrders.filter(o => String(o.table) !== String(table));
             localStorage.setItem('cached_orders', JSON.stringify(localOrders));
             
+            // ปิดหน้าต่างโมดอลและแจ้งเตือนทันที ป้องกันอาการค้างหน้าจอเดิม
             closeBillingModal(); 
             renderAll(); 
             showToast(`💰 เคลียร์บิล โต๊ะ ${table} สำเร็จ!`, "🟢");
 
-            try {
-                await fetch(API_URL, { 
-                    method: "POST", 
-                    mode: "no-cors", 
-                    body: JSON.stringify({ action: "billTable", table: table }) 
-                });
-                setTimeout(() => { syncWithGoogleSheet(); }, 800);
-            } catch(e) {
-                console.error(e);
-            } finally {
-                btn.disabled = false; btn.innerText = "💰 รับชำระเงินและปิดโต๊ะ";
-            }
+            // ยิงคำสั่งปิดบิลไปที่ Google ชีทแบบเบื้องหลัง
+            fetch(API_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify({ action: "billTable", table: table }) 
+            }).then(() => {
+                setTimeout(() => { syncWithGoogleSheet(); }, 500);
+            }).catch(e => {
+                console.error("Background spreadsheet update deferred.");
+            });
         }
 
         function renderAdminInventoryList() {
