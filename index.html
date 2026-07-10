@@ -41,8 +41,8 @@
                     
                     <div class="flex items-center gap-2">
                         <select id="client-table-select" onchange="handleClientTableChange()" class="bg-black/20 hover:bg-black/30 text-white font-bold text-xs py-2 px-2.5 rounded-xl border border-white/20 focus:outline-none cursor-pointer">
-                            <option value="A01">โต๊ะ A01</option>
-                            <option value="A02" selected>โต๊ะ A02</option>
+                            <option value="A01" selected>โต๊ะ A01</option>
+                            <option value="A02">โต๊ะ A02</option>
                             <option value="A03">โต๊ะ A03</option>
                             <option value="A04">โต๊ะ A04</option>
                             <option value="A05">โต๊ะ A05</option>
@@ -69,12 +69,14 @@
                         <div><p class="font-bold">พิเศษวันนี้! สั่งอาหารยอดรวมครบ 300 บาท</p><p class="text-orange-700">รับฟรี! ไข่ต้มยางมะตูมเยิ้มๆ ทันที 1 ฟอง</p></div>
                     </div>
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-2" id="client-categories-list"></div>
-                    <div class="grid grid-cols-2 gap-3" id="client-food-grid"></div>
+                    <div class="grid grid-cols-2 gap-3" id="client-food-grid">
+                        <p class="col-span-2 text-center text-xs text-slate-400 py-10">กำลังโหลดรายการอาหารแซ่บๆ สักครู่ครับ...</p>
+                    </div>
                 </div>
 
                 <div id="client-track-subtab" class="hidden space-y-4">
                     <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-sm flex justify-between items-center text-xs">
-                        <span id="table-track-name" class="bg-orange-600 text-white font-black px-3 py-1 rounded-lg text-sm">โต๊ะ A02</span>
+                        <span id="table-track-name" class="bg-orange-600 text-white font-black px-3 py-1 rounded-lg text-sm">โต๊ะ A01</span>
                         <span class="text-slate-500">ระบบประมวลยอดรวมสะสมของจานอาหารไว้ให้แล้ว</span>
                     </div>
                     <div id="client-tracking-list" class="space-y-3"></div>
@@ -90,7 +92,7 @@
             </div>
         </div>
 
-        <div id="staff-view-section" class="hidden space-y-6">
+        <div id="staff-view-section" class="hidden space-y-6 animate-fade-in">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-base font-black flex items-center gap-2">แผงควบคุมระบบหลังบ้าน <span class="bg-orange-600 px-2 py-0.5 rounded text-xs font-bold">STAFF MODE</span></h1>
@@ -112,7 +114,7 @@
                     <div class="bg-white rounded-3xl p-5 border shadow-lg">
                         <div class="mb-3">
                             <h2 class="text-sm font-bold text-slate-900">🌶️ จัดการเปิด-ปิดเมนูสินค้า (ของหมด)</h2>
-                            <p class="text-[11px] text-slate-400">กดเพื่อเปลี่ยนสถานะหน้าเว็บบนมือถือลูกค้าทันที</p>
+                            <p class="text-[11px] text-slate-400">กดเปลี่ยนสถานะเพื่อแจ้งลูกค้าบนหน้าจอมือถือได้ทันที</p>
                         </div>
                         <div class="max-h-[350px] overflow-y-auto space-y-2" id="admin-inventory-list"></div>
                     </div>
@@ -146,7 +148,7 @@
     <div id="customize-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
             <div id="modal-banner-container" class="h-44 bg-gradient-to-r from-orange-600 to-red-600 flex items-end p-5 text-white bg-cover bg-center relative">
-                <div class="absolute inset-0 bg-black/40 z-10"></div>
+                <div id="modal-banner-overlay" class="absolute inset-0 bg-black/40 z-10"></div>
                 <div class="flex items-center gap-3 z-20 relative">
                     <div id="modal-food-icon" class="text-3xl bg-white/20 w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden">🥗</div>
                     <div><h3 id="modal-food-name" class="font-extrabold text-base">ชื่อเมนูอาหาร</h3><p id="modal-food-price" class="text-sm text-orange-200 font-bold">฿0</p></div>
@@ -197,7 +199,7 @@
     <div id="billing-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-4 bg-slate-900 text-white flex justify-between items-center font-bold text-sm">
-                <span>💵 รายการเช็คบิลปิดรอบโต๊ะ - <span id="bill-table-title" class="bg-orange-600 px-2 py-0.5 rounded text-xs">A02</span></span>
+                <span>💵 รายการเช็คบิลปิดรอบโต๊ะ - <span id="bill-table-title" class="bg-orange-600 px-2 py-0.5 rounded text-xs">A01</span></span>
                 <button onclick="closeBillingModal()" class="text-xl">×</button>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto flex-1">
@@ -236,7 +238,7 @@
             <h3 class="font-extrabold text-lg text-slate-900">🔥 สั่งอาหารสำเร็จแล้ว!</h3>
             <p class="text-xs text-slate-500">คิวอาหารส่งถึงครัวเรียบร้อย พนักงานกำลังเร่งทำอาหารเพื่อไปเสิร์ฟให้ที่โต๊ะครับ</p>
             <div class="bg-orange-50 border border-orange-100 rounded-2xl p-3 text-left text-[11px] text-orange-950 space-y-0.5">
-                <p>📍 โต๊ะบริการ: <span id="success-modal-table" class="font-bold">A02</span></p>
+                <p>📍 โต๊ะบริการ: <span id="success-modal-table" class="font-bold">A01</span></p>
                 <p>💰 รวมยอดรอบนี้: <span id="success-modal-total" class="font-bold">฿0</span></p>
             </div>
             <button onclick="closeOrderSuccessModal()" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl text-xs shadow-md">รับทราบ, ทานให้อร่อยครับ!</button>
@@ -251,24 +253,17 @@
         let IS_SIMULATION = false; 
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
 
-        // FALLBACK TEMPLATE SEED
         let localCategories = [
             { category_name: "ส้มตำ", status: "open", icon: "🥗" },
             { category_name: "ย่าง/ทอด", status: "open", icon: "🍗" },
             { category_name: "อาหารอีสาน", status: "open", icon: "🍲" },
             { category_name: "ของทานเล่น/ข้าว", status: "open", icon: "🍚" }
         ];
-        let localMenu = [
-            { menu_id: "M001", name: "ตำไทย", price: 50, category: "ส้มตำ", image: "🥗", desc: "ตำไทยรสเด็ด หวานเปรี้ยวกลมกล่อม", status: "open" },
-            { menu_id: "M002", name: "ตำปูปลาร้า", price: 60, category: "ส้มตำ", image: "🌶️", desc: "ส้มตำปลาร้านัวๆ รสชาติถึงอกถึงใจ", status: "open" },
-            { menu_id: "M006", name: "ไก่ย่าง", price: 80, category: "ย่าง/ทอด", image: "🍗", desc: "ไก่หมักสมุนไพรย่างเตาถ่านหอมกรุ่น", status: "open" },
-            { menu_id: "M014", name: "ข้าวเหนียว", price: 15, category: "ของทานเล่น/ข้าว", image: "🍚", desc: "ข้าวเหนียวหอมนุ่มร้อนๆ", status: "open" }
-        ];
+        let localMenu = [];
         let localOrders = []; let localOrderItems = []; let cart = [];
-        let clientSelectedCategory = "ทั้งหมด"; let activeClientTab = "menu"; let currentClientTable = "A02";
+        let clientSelectedCategory = "ทั้งหมด"; let activeClientTab = "menu"; let currentClientTable = "A01";
         let activeTableForBill = null; let activePaymentMode = "cash"; let currentCustomizingItem = null; let selectedSpiciness = "เผ็ดน้อย";
 
-        // SAFE CACHE RENDERING CONTROLLER (PREVENTS BLANK SCREEN OVERRIDES)
         function safeRestoreCache() {
             try {
                 const cCats = localStorage.getItem('tumzap_categories');
@@ -289,7 +284,6 @@
             setInterval(() => { if(!IS_SIMULATION) syncWithGoogleSheet(); }, 5000);
         };
 
-        // EXTREMELY ROBUST ASYNCHRONOUS ENGINE (try-catch isolated fields loop)
         async function syncWithGoogleSheet() {
             try {
                 const res = await fetch(`${API_URL}?action=getInitialData`);
@@ -335,7 +329,7 @@
                         localStorage.setItem('tumzap_order_items', JSON.stringify(localOrderItems));
                     }
                 }
-            } catch(e) { console.warn("Network offline or parsing insulated."); }
+            } catch(e) { console.warn("Network polling deferred."); }
             finally { renderAll(); }
         }
 
@@ -344,7 +338,7 @@
             try { renderClientMenuItems(); } catch(e){}
             try { renderKitchenDashboard(); } catch(e){}
             try { renderCashierGrid(); } catch(e){}
-            try { renderAdminInventoryList(); } catch(e){} // Renders the newly added inventory manager screen!
+            try { renderAdminInventoryList(); } catch(e){}
             try { updateUnpaidBadge(); } catch(e){}
         }
 
@@ -352,7 +346,7 @@
             const container = document.getElementById('client-categories-list');
             let html = `<button onclick="filterClientCategory('ทั้งหมด')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all ${clientSelectedCategory === 'ทั้งหมด' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200'}">🌱 ทั้งหมด</button>`;
             localCategories.forEach(cat => {
-                if(cat.status === 'closed') return; // Skip entirely if hidden
+                if(cat.status === 'closed') return;
                 html += `<button onclick="filterClientCategory('${cat.category_name}')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 ${clientSelectedCategory === cat.category_name ? '!bg-orange-600 !text-white shadow-md' : ''}">${cat.icon || '🥗'} ${cat.category_name}</button>`;
             });
             container.innerHTML = html;
@@ -360,10 +354,18 @@
 
         function renderClientMenuItems() {
             const container = document.getElementById('client-food-grid');
+            if (localMenu.length === 0) {
+                container.innerHTML = `<p class="col-span-2 text-center text-xs text-slate-400 py-10">⚠️ กรุณาเพิ่มรายการอาหารและหัวตารางใน Google Sheet แท็บ MENU ให้เรียบร้อยครับ</p>`;
+                return;
+            }
             container.innerHTML = '';
             
             const filtered = localMenu.filter(m => clientSelectedCategory === "ทั้งหมด" || m.category === clientSelectedCategory);
-            
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="col-span-2 text-center text-xs text-slate-400 py-10">ไม่มีรายการอาหารในหมวดหมู่นี้</p>`;
+                return;
+            }
+
             filtered.forEach(item => {
                 const isSoldOut = item.status === 'sold out' || item.status === 'hide';
                 const imgStr = item.image ? String(item.image).trim() : '';
@@ -379,7 +381,7 @@
                         ${isSoldOut ? `<span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md z-20">❌ ของหมดวันนี้</span>` : ''}
                         <div class="w-full h-24 sm:h-28 overflow-hidden relative">${imgBlock}</div>
                         <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
-                            <div><h4 class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-1">${item.name}</h4><p class="text-[9px] sm:text-[10px] text-slate-400 line-clamp-2 leading-tight">${item.desc || 'สูตรรสแซ่บจัดจ้านเอกลักษณ์ของร้านตำแซ่บ'}</p></div>
+                            <div><h4 class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-1">${item.name}</h4><p class="text-[9px] sm:text-[10px] text-slate-400 line-clamp-2 leading-tight">${item.desc || 'สูตรต้นตำรับจัดจ้านแซ่บซี๊ดถึงใจ'}</p></div>
                             <div class="flex justify-between items-center pt-1"><span class="text-xs sm:text-sm font-black text-slate-800">฿${item.price}</span><button onclick="openCustomizeModal('${item.menu_id}')" class="bg-orange-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm hover:bg-orange-700">+ สั่งเลย</button></div>
                         </div>
                     </div>
@@ -387,10 +389,9 @@
             });
         }
 
-        // BRAND NEW METHOD: RENDERS INTERACTIVE STOCK MANAGEMENT FOR MENU ITEMS (SOLD OUT TOGGLE SWITCH)
         function renderAdminInventoryList() {
             const container = document.getElementById('admin-inventory-list');
-            if(!container) return;
+            if(!container || localMenu.length === 0) return;
             container.innerHTML = localMenu.map(item => {
                 const isSold = item.status === 'sold out';
                 return `
@@ -400,34 +401,30 @@
                             <div><p class="text-xs font-bold text-slate-800">${item.name}</p><p class="text-[10px] text-slate-400">หมวด: ${item.category} | ฿${item.price}</p></div>
                         </div>
                         <button onclick="toggleItemStockStatus('${item.menu_id}', '${isSold ? 'open' : 'sold out'}')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all shadow-xs ${isSold ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}">
-                            ${isSold ? '🔴 ของหมด (Sold Out)' : '🟢 กำลังเปิดขาย (Open)'}
+                            ${isSold ? '🔴 ของหมด (Sold Out)' : '🟢 เปิดขาย (Open)'}
                         </button>
                     </div>
                 `;
             }).join('');
         }
 
-        // TRIGGER INVENTORY STOCK API DISPATCHER TO WRITE CHANGES DIRECTLY IN GOOGLE SHEETS
         async function toggleItemStockStatus(menuId, nextStatus) {
-            // Optimistic UI Local update
             const targetIdx = localMenu.findIndex(m => m.menu_id === menuId);
             if(targetIdx !== -1) {
                 localMenu[targetIdx].status = nextStatus;
                 renderAll();
             }
-            showToast("กำลังบันทึกสถานะใหม่ลงกูเกิลชีท...", "⏳");
+            showToast("กำลังส่งคำสั่งเปลี่ยนสถานะเข้าชีท...", "⏳");
             try {
-                // Background push to eliminate UI block lags
                 fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateItemStatus", menu_id: menuId, status: nextStatus })
                 });
-                setTimeout(() => { syncWithGoogleSheet(); showToast("💾 บันทึกสถานะสต็อกเรียบร้อยแล้ว!", "🟢"); }, 1000);
-            } catch(e) { showToast("เครือข่ายขัดข้อง ปรับชั่วคราวในแอป", "⚠️"); }
+                setTimeout(() => { syncWithGoogleSheet(); showToast("💾 บันทึกการเปิด-ปิดเมนูอาหารเรียบร้อย!", "🟢"); }, 1000);
+            } catch(e) { showToast("เครือข่ายขัดข้อง", "⚠️"); }
         }
 
-        // SEPARATION ENGINE: PLUGS PURE SUBMISSIONS IN TEXT/PLAIN WITHOUT COR FOR ZERO HANGS SUPPORT
         async function submitOrderToBackend() {
             if (cart.length === 0) return;
             const orderId = "O" + Math.floor(1000 + Math.random() * 9000);
@@ -439,20 +436,17 @@
                 qty: c.qty, price: c.price
             }));
 
-            // Force push straight to local instance memory state (Guarantees immediate zero-lag injection!)
             localOrders.push({ order_id: orderId, table: currentClientTable, items: payloadItems, total: totalSum, status: 'new', time: orderTime });
             payloadItems.forEach(i => { localOrderItems.push({ order_id: orderId, menu: i.name, qty: i.qty, price: i.price }); });
             
-            // Snappy Client success feedback Modal
             const savedTable = currentClientTable;
             cart = []; updateClientCartSummary(); closeCartModal();
             openOrderSuccessModal(savedTable, totalSum);
             switchClientTab('track');
-            renderAll(); // Immediate visual draw
+            renderAll();
 
             if (!IS_SIMULATION) {
                 try {
-                    // Pure plain dispatcher without custom headers completely bypasses CORS filters blocking threads!
                     fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
@@ -463,7 +457,6 @@
             }
         }
 
-        // RENDER KITCHEN CONTAINER WITH ISOLATED PROTECTION AGAINST CORRUPT JSON LINES
         function renderKitchenDashboard() {
             const container = document.getElementById('kitchen-queue-container');
             const kitchenOrders = localOrders.filter(o => o.status === 'new' || o.status === 'cooking' || o.status === 'ready');
@@ -477,27 +470,26 @@
             container.innerHTML = '';
 
             kitchenOrders.forEach(o => {
-                // Isolate items query per token key
                 const subItems = localOrderItems.filter(i => i.order_id === o.order_id);
                 let innerRows = '';
                 subItems.forEach(i => {
-                    innerRows += `<li class="text-xs text-slate-700 py-1 border-b border-dashed border-slate-100 last:border-0 flex justify-between font-medium"><span>- ${i.menu}</span><span class="font-bold text-slate-900">x${i.qty}</span></li>`;
+                    innerRows += `<li class="text-xs text-slate-700 py-1 border-b border-dashed border-slate-100 flex justify-between font-medium"><span>- ${i.menu}</span><span class="font-bold text-slate-900">x${i.qty}</span></li>`;
                 });
 
                 let badge = '', btn = '';
                 if(o.status === 'new') {
                     badge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">🟡 รอคิวปรุง</span>`;
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking')" class="w-full bg-orange-600 text-white text-[11px] font-bold py-2 rounded-xl">🧑‍🍳 เริ่มปรุง</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking')" class="w-full bg-orange-600 text-white text-[11px] font-bold py-2 rounded-xl shadow-md">👩‍🍳 เริ่มปรุงอาหาร</button>`;
                 } else if(o.status === 'cooking') {
-                    badge = `<span class="bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">🟠 กำลังทำ</span>`;
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready')" class="w-full bg-green-500 text-white text-[11px] font-bold py-2 rounded-xl">🔔 พร้อมเสิร์ฟ</button>`;
+                    badge = `<span class="bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">🟠 กำลังปรุง</span>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready')" class="w-full bg-green-500 text-white text-[11px] font-bold py-2 rounded-xl shadow-md">🔔 พร้อมเสิร์ฟ</button>`;
                 } else {
                     badge = `<span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">🟢 เสร็จแล้ว</span>`;
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'served')" class="w-full bg-slate-800 text-white text-[11px] font-bold py-2 rounded-xl">🍽️ เสิร์ฟแล้ว</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'served')" class="w-full bg-slate-800 text-white text-[11px] font-bold py-2 rounded-xl shadow-md">🍽️ เสิร์ฟเรียบร้อย</button>`;
                 }
 
                 container.innerHTML += `
-                    <div class="bg-white border rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-3">
+                    <div class="bg-white border rounded-2xl p-4 shadow-xs flex flex-col justify-between space-y-3 border-slate-150">
                         <div>
                             <div class="flex justify-between border-b pb-1.5 mb-1.5 font-bold text-xs"><span>#${o.order_id}</span><span class="bg-slate-900 text-white px-2 py-0.5 rounded">${o.table}</span></div>
                             <ul class="space-y-0.5">${innerRows}</ul>
@@ -508,7 +500,14 @@
             });
         }
 
-        // CASHIER MATRIX DRAWER WITH INJECTION FAILS PROTECTION SAFEGUARDS
+        async function updateOrderStatus(orderId, status) {
+            localOrders.forEach((o, i) => { if(o.order_id === orderId) localOrders[i].status = status; }); renderAll();
+            try { 
+                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) }); 
+                setTimeout(() => syncWithGoogleSheet(), 1000); 
+            } catch(e){}
+        }
+
         function renderCashierGrid() {
             const container = document.getElementById('cashier-table-grid');
             container.innerHTML = '';
@@ -535,13 +534,39 @@
             });
         }
 
-        // Live calculator for cash change (Guarantees re-enabled state control loops)
-        function calculateChange() {
-            const total = parseFloat(document.getElementById('bill-grand-total').innerText) || 0;
-            const rec = parseFloat(document.getElementById('cash-received-input').value) || 0;
-            const target = document.getElementById('cash-change-amount');
-            if (rec >= total) { target.innerText = (rec - total).toFixed(0); target.className = "text-base font-black text-green-600"; }
-            else { target.innerText = "0"; target.className = "text-base font-black text-slate-400"; }
+        function openBillingModal(table) { activeTableForBill = table; renderBillingModalDetails(table); document.getElementById('billing-modal').classList.remove('hidden'); }
+        function closeBillingModal() { document.getElementById('billing-modal').classList.add('hidden'); activeTableForBill = null; }
+
+        function renderBillingModalDetails(tableCode) {
+            document.getElementById('bill-table-title').innerText = tableCode;
+            document.getElementById('bill-service-type').innerText = tableCode === "Takeaway" ? "🥡 บริการซื้อกลับบ้าน" : (tableCode === "Delivery" ? "🛵 จัดส่งภายนอก" : "🍽️ ทานที่ร้าน");
+
+            const activeOrders = localOrders.filter(o => o.table === tableCode && o.status !== 'paid' && o.status !== 'cancelled');
+            const tbody = document.getElementById('billing-items-rows');
+            tbody.innerHTML = '';
+
+            let grandTotal = 0;
+            activeOrders.forEach(o => {
+                const subItems = localOrderItems.filter(i => i.order_id === o.order_id);
+                subItems.forEach(item => {
+                    const rowPrice = item.price * item.qty;
+                    grandTotal += rowPrice;
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-50">
+                            <td class="py-2 text-left">${item.menu}</td>
+                            <td class="py-2 text-center font-bold">${item.qty}</td>
+                            <td class="py-2 text-right font-bold text-slate-800">฿${rowPrice}</td>
+                        </tr>
+                    `;
+                });
+            });
+
+            document.getElementById('bill-grand-total').innerText = grandTotal;
+            document.getElementById('qr-total-placeholder').innerText = grandTotal;
+            document.getElementById('promptpay-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://promptpay.io/0999999999/${grandTotal}`;
+            document.getElementById('cash-received-input').value = "";
+            document.getElementById('cash-change-amount').innerText = "0";
+            selectPayMode('cash');
         }
 
         async function payOffTableBill() {
@@ -549,21 +574,19 @@
             if (activePaymentMode === 'cash') {
                 const total = parseFloat(document.getElementById('bill-grand-total').innerText) || 0;
                 const rec = parseFloat(document.getElementById('cash-received-input').value) || 0;
-                if (rec < total) { alert("กรุณารับยอดเงินสดมาให้เท่ากับหรือมากกว่ายอดบิลรวมสะสมครับ"); return; }
+                if (rec < total) { alert("กรุณารับเงินสดมาให้ครบถ้วนเพื่อปิดบิลครับ"); return; }
             }
 
             const table = activeTableForBill;
             const btn = document.getElementById('cashier-confirm-pay-btn');
             btn.disabled = true; btn.innerText = "⏳ บันทึกปิดบิล...";
 
-            // Local Memory purge validation loop instantly
             localOrders.forEach((o, i) => { if (o.table === table && o.status !== 'paid') localOrders[i].status = 'paid'; });
             sessionStorage.removeItem(`alert_${table}`);
             closeBillingModal(); renderAll(); showToast("💰 ปิดโต๊ะรับชำระเงินสำเร็จ!", "🟢");
 
             if (!IS_SIMULATION) {
                 try {
-                    // CORS-Proof plain dispatcher without custom headers completely prevents request hang state freezes!
                     await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "billTable", table: table }) });
                     setTimeout(() => { syncWithGoogleSheet(); }, 1000);
                 } catch(e) { console.error(e); }
@@ -571,43 +594,37 @@
             }
         }
 
-        // ==================== SYSTEM AUXILIARY HELPER CONTROLLERS ====================
+        function calculateChange() {
+            const total = parseFloat(document.getElementById('bill-grand-total').innerText) || 0;
+            const rec = parseFloat(document.getElementById('cash-received-input').value) || 0;
+            const target = document.getElementById('cash-change-amount');
+            if (rec >= total) { target.innerText = (rec - total).toFixed(0); target.className = "text-sm font-black text-green-600"; }
+            else { target.innerText = "0"; target.className = "text-sm font-black text-slate-400"; }
+        }
+
+        function selectPayMode(m) {
+            activePaymentMode = m; const cBtn = document.getElementById('pay-mode-cash-btn'), qBtn = document.getElementById('pay-mode-qr-btn'), cP = document.getElementById('cash-payment-panel'), qP = document.getElementById('qr-payment-panel');
+            if(m==='cash'){ cBtn.className="p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl transition-all"; qBtn.className="p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"; cP.classList.remove('hidden'); qP.classList.add('hidden'); }
+            else { qBtn.className="p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl transition-all"; cBtn.className="p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"; qP.classList.remove('hidden'); cP.classList.add('hidden'); }
+        }
+
+        function setQuickCash(v) { document.getElementById('cash-received-input').value = v; calculateChange(); }
+        function setExactCash() { document.getElementById('cash-received-input').value = document.getElementById('bill-grand-total').innerText; calculateChange(); }
         function filterClientCategory(cat) { clientSelectedCategory = cat; renderAll(); }
         function openLoginModal() { document.getElementById('staff-password-input').value = ""; document.getElementById('login-modal').classList.remove('hidden'); }
         function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
-        function submitStaffLogin() {
-            if(document.getElementById('staff-password-input').value === "zaq123") {
-                closeLoginModal(); document.getElementById('customer-view-section').classList.add('hidden');
-                document.getElementById('staff-view-section').classList.remove('hidden'); renderAll();
-            } else { alert("รหัสผ่านไม่ถูกต้อง"); }
-        }
+        function submitStaffLogin() { if(document.getElementById('staff-password-input').value === "zaq123") { closeLoginModal(); document.getElementById('customer-view-section').classList.add('hidden'); document.getElementById('staff-view-section').classList.remove('hidden'); renderAll(); } else { alert("รหัสผ่านไม่ถูกต้อง"); } }
         function logoutStaff() { document.getElementById('staff-view-section').classList.add('hidden'); document.getElementById('customer-view-section').classList.remove('hidden'); }
         function switchClientTab(tab) { activeClientTab = tab; switchClientTabUI(); }
         function switchClientTabUI() {
             const menuBtn = document.getElementById('tab-menu-btn'), trackBtn = document.getElementById('tab-track-btn');
             const menuTab = document.getElementById('client-menu-subtab'), trackTab = document.getElementById('client-track-subtab');
-            if(activeClientTab === 'menu') {
-                menuBtn.className = "flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm transition-all";
-                trackBtn.className = "flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10 transition-all";
-                menuTab.classList.remove('hidden'); trackTab.classList.add('hidden');
-                document.getElementById('client-floating-cart-bar').classList.remove('hidden');
-            } else {
-                trackBtn.className = "flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm transition-all";
-                menuBtn.className = "flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10 transition-all";
-                trackTab.classList.remove('hidden'); menuTab.classList.add('hidden');
-                document.getElementById('client-floating-cart-bar').classList.add('hidden');
-                renderClientTrackingList();
-            }
+            if(activeClientTab === 'menu') { menuBtn.className = "flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm"; trackBtn.className = "flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10"; menuTab.classList.remove('hidden'); trackTab.classList.add('hidden'); document.getElementById('client-floating-cart-bar').classList.remove('hidden'); }
+            else { trackBtn.className = "flex-1 text-center py-2 rounded-lg font-bold bg-white text-orange-700 shadow-sm"; menuBtn.className = "flex-1 text-center py-2 rounded-lg font-medium text-white hover:bg-white/10"; trackTab.classList.remove('hidden'); menuTab.classList.add('hidden'); document.getElementById('client-floating-cart-bar').classList.add('hidden'); renderClientTrackingList(); }
         }
         function handleClientTableChange() { currentClientTable = document.getElementById('client-table-select').value; document.getElementById('table-track-name').innerText = "โต๊ะ " + currentClientTable; updateUnpaidBadge(); if(activeClientTab==='track') renderClientTrackingList(); }
-        function updateUnpaidBadge() {
-            const hasUnpaid = localOrders.some(o => o.table === currentClientTable && o.status !== 'paid' && o.status !== 'cancelled');
-            document.getElementById('unpaid-order-badge').className = hasUnpaid ? "bg-yellow-400 w-2 h-2 rounded-full animate-pulse" : "hidden";
-        }
-        function selectSpiciness(lvl) {
-            selectedSpiciness = lvl; document.querySelectorAll('.sp-choice-btn').forEach(b => b.className = "sp-choice-btn border rounded-xl py-2 text-xs font-bold text-slate-700 bg-white");
-            document.getElementById(`sp-btn-${lvl}`).className = "sp-choice-btn border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold rounded-xl py-2 text-xs ring-2 ring-orange-100";
-        }
+        function updateUnpaidBadge() { const hasUnpaid = localOrders.some(o => o.table === currentClientTable && o.status !== 'paid' && o.status !== 'cancelled'); document.getElementById('unpaid-order-badge').className = hasUnpaid ? "bg-yellow-400 w-2 h-2 rounded-full animate-pulse" : "hidden"; }
+        function selectSpiciness(lvl) { selectedSpiciness = lvl; document.querySelectorAll('.sp-choice-btn').forEach(b => b.className = "sp-choice-btn border rounded-xl py-2 text-xs font-bold text-slate-700 bg-white"); document.getElementById(`sp-btn-${lvl}`).className = "sp-choice-btn border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold rounded-xl py-2 text-xs ring-2 ring-orange-100"; }
         function openCustomizeModal(menuId) {
             const item = localMenu.find(m => m.menu_id === menuId); if(!item) return;
             currentCustomizingItem = item;
@@ -618,25 +635,16 @@
             
             const banner = document.getElementById('modal-banner-container'), icon = document.getElementById('modal-food-icon'), overlay = document.getElementById('modal-banner-overlay');
             const imgStr = item.image ? String(item.image).trim() : '';
-            if(imgStr.startsWith('http') || imgStr.includes('/')) {
-                banner.style.backgroundImage = `url('${imgStr}')`; overlay.className = "absolute inset-0 bg-black/50 z-10"; icon.classList.add('hidden');
-            } else {
-                banner.style.backgroundImage = 'none'; banner.style.background = 'linear-gradient(to right, #ea580c, #dc2626)'; overlay.className = "hidden"; icon.classList.remove('hidden'); icon.innerText = imgStr || getFallbackIcon(item.category, item.name);
-            }
+            if(imgStr.startsWith('http') || imgStr.includes('/')) { banner.style.backgroundImage = `url('${imgStr}')`; overlay.className = "absolute inset-0 bg-black/50 z-10"; icon.classList.add('hidden'); }
+            else { banner.style.backgroundImage = 'none'; banner.style.background = 'linear-gradient(to right, #ea580c, #dc2626)'; overlay.className = "hidden"; icon.classList.remove('hidden'); icon.innerText = imgStr || getFallbackIcon(item.category, item.name); }
             if(item.category === 'ส้มตำ' || item.category === 'อาหารอีสาน') { document.getElementById('spiciness-section').classList.remove('hidden'); selectSpiciness('เผ็ดน้อย'); }
             else { document.getElementById('spiciness-section').classList.add('hidden'); selectedSpiciness = ''; }
             document.getElementById('customize-modal').classList.remove('hidden');
         }
         function closeCustomizeModal() { document.getElementById('customize-modal').classList.add('hidden'); }
         function adjustModalQty(v) { const t = document.getElementById('modal-qty-text'); let cur = parseInt(t.innerText)+v; if(cur<1) cur=1; t.innerText = cur; }
-        function confirmAddToCart() {
-            cart.push({ id: currentCustomizingItem.menu_id, name: currentCustomizingItem.name, price: currentCustomizingItem.price, qty: parseInt(document.getElementById('modal-qty-text').innerText), spiciness: selectedSpiciness, notes: document.getElementById('modal-food-notes').value.trim(), image: currentCustomizingItem.image });
-            updateClientCartSummary(); closeCustomizeModal(); showToast(`🛒 เพิ่ม ${currentCustomizingItem.name} เข้าตะกร้าแล้ว`, "😋");
-        }
-        function updateClientCartSummary() {
-            let q = 0, p = 0; cart.forEach(c => { q+=c.qty; p+=(c.price*c.qty); });
-            document.getElementById('cart-item-count').innerText = q; document.getElementById('cart-total-price').innerText = p;
-        }
+        function confirmAddToCart() { cart.push({ id: currentCustomizingItem.menu_id, name: currentCustomizingItem.name, price: currentCustomizingItem.price, qty: parseInt(document.getElementById('modal-qty-text').innerText), spiciness: selectedSpiciness, notes: document.getElementById('modal-food-notes').value.trim(), image: currentCustomizingItem.image }); updateClientCartSummary(); closeCustomizeModal(); showToast(`🛒 เพิ่ม ${currentCustomizingItem.name} เข้าตะกร้าแล้ว`, "😋"); }
+        function updateClientCartSummary() { let q = 0, p = 0; cart.forEach(c => { q+=c.qty; p+=(c.price*c.qty); }); document.getElementById('cart-item-count').innerText = q; document.getElementById('cart-total-price').innerText = p; }
         function openCartModal() {
             if(cart.length === 0) return showToast("ตะกร้าว่างเปล่า เลือกเมนูก่อนนะครับ", "⚠️");
             document.getElementById('cart-table-badge').innerText = currentClientTable;
@@ -644,30 +652,15 @@
             let sum = 0;
             cart.forEach((c, i) => {
                 sum += (c.price * c.qty);
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs flex items-center justify-between gap-2 text-xs">
-                        <div><h4 class="font-bold text-slate-800">${c.name} ${c.spiciness ? `<span class="text-red-600">(${c.spiciness})</span>`:''}</h4><p class="text-[10px] text-slate-400 mt-0.5">฿${c.price} x ${c.qty} ชิ้น</p>${c.notes? `<p class="text-[9px] text-red-500 font-bold mt-0.5">📝 ${c.notes}</p>`:''}</div>
-                        <button onclick="removeCartItem(${i})" class="bg-red-50 text-red-600 border border-red-100 p-2 rounded-xl">ลบ</button>
-                    </div>
-                `;
+                container.innerHTML += `<div class="bg-white rounded-2xl p-3 border shadow-xs flex items-center justify-between gap-2 text-xs"><div><h4 class="font-bold text-slate-800">${c.name} ${c.spiciness ? `<span class="text-red-600">(${c.spiciness})</span>`:''}</h4><p class="text-[10px] text-slate-400 mt-0.5">฿${c.price} x ${c.qty} ชิ้น</p>${c.notes? `<p class="text-[9px] text-red-500 font-bold mt-0.5">📝 ${c.notes}</p>`:''}</div><button onclick="removeCartItem(${i})" class="bg-red-50 text-red-600 border p-2 rounded-xl">ลบ</button></div>`;
             });
-            document.getElementById('cart-subtotal').innerText = sum; document.getElementById('cart-grandtotal').innerText = sum;
-            document.getElementById('cart-modal').classList.remove('hidden');
+            document.getElementById('cart-subtotal').innerText = sum; document.getElementById('cart-grandtotal').innerText = sum; document.getElementById('cart-modal').classList.remove('hidden');
         }
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
         function removeCartItem(i) { cart.splice(i, 1); if(cart.length===0) closeCartModal(); else openCartModal(); updateClientCartSummary(); }
         function openOrderSuccessModal(t, sum) { document.getElementById('success-modal-table').innerText = t; document.getElementById('success-modal-total').innerText = sum; document.getElementById('order-success-modal').classList.remove('hidden'); }
         function closeOrderSuccessModal() { document.getElementById('order-success-modal').classList.add('hidden'); }
-        async function updateOrderStatus(orderId, status) {
-            localOrders.forEach((o, i) => { if(o.order_id === orderId) localOrders[i].status = status; }); renderAll();
-            try { fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) }); setTimeout(() => syncWithGoogleSheet(), 1000); } catch(e){}
-        }
-        function openBillingModal(table) { activeTableForBill = table; renderBillingModalDetails(table); document.getElementById('billing-modal').classList.remove('hidden'); }
-        function closeBillingModal() { document.getElementById('billing-modal').classList.add('hidden'); activeTableForBill = null; }
-        function selectPayMode(m) { activePaymentMode = m; const cBtn = document.getElementById('pay-mode-cash-btn'), qBtn = document.getElementById('pay-mode-qr-btn'), cP = document.getElementById('cash-payment-panel'), qP = document.getElementById('qr-payment-panel'); if(m==='cash'){ cBtn.className="p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl"; qBtn.className="p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl"; cP.classList.remove('hidden'); qP.classList.add('hidden'); }else{ qBtn.className="p-2 border-2 border-orange-600 bg-orange-50 text-orange-950 font-bold text-xs rounded-xl"; cBtn.className="p-2 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl"; qP.classList.remove('hidden'); cP.classList.add('hidden'); } }
-        function setQuickCash(v) { document.getElementById('cash-received-input').value = v; calculateChange(); }
-        function setExactCash() { document.getElementById('cash-received-input').value = document.getElementById('bill-grand-total').innerText; calculateChange(); }
-        function requestService(alert, msg) { showToast(clientConfirmationMsg, "🔔"); sessionStorage.setItem(`alert_${currentClientTable}`, alert); renderAll(); }
+        function requestService(alert, msg) { showToast(msg, "🔔"); sessionStorage.setItem(`alert_${currentClientTable}`, alert); renderAll(); }
         function showToast(txt, icon="🌶️") { const toast = document.getElementById('toast-message'); document.getElementById('toast-icon').innerText = icon; document.getElementById('toast-text').innerText = txt; toast.classList.remove('hidden'); setTimeout(() => toast.classList.add('hidden'), 2500); }
     </script>
 </body>
