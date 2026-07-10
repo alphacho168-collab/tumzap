@@ -23,22 +23,21 @@
         <!-- ==================== 📱 CUSTOMER INTERFACE (หน้าฝั่งลูกค้า) ==================== -->
         <div id="customer-view-section" class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col h-[820px] relative">
             
-            <!-- BRAND HEADER -->
-            <div class="bg-gradient-to-br from-orange-600 to-red-600 p-5 text-white shadow-lg relative">
-                <div class="flex justify-between items-center">
+            <!-- FIXED BRAND HEADER (ซ่อมแซมส่วนหัวที่หายไปและล็อกปุ่มกุญแจ 🔑) -->
+            <div class="bg-gradient-to-br from-orange-600 to-red-600 p-5 text-white shadow-lg relative block z-30">
+                <div class="flex justify-between items-center w-full">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md flex items-center justify-center bg-white">
-                            <img src="ChatGPT Image 23 มิ.ย. 2569 12_32_09.png" alt="ตำแซ่บ ซ.4" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('client-logo-fallback').style.display='flex'">
-                            <div id="client-logo-fallback" class="hidden absolute inset-0 items-center justify-center text-xl bg-white text-slate-900">🌶️</div>
+                        <div class="w-10 h-10 rounded-full border-2 border-white shadow-md flex items-center justify-center bg-white overflow-hidden flex-shrink-0">
+                            <span class="text-xl">🌶️</span>
                         </div>
                         <div>
-                            <h2 class="font-extrabold text-base leading-tight tracking-wide">ตำแซ่บ ซ.4</h2>
+                            <h2 class="font-extrabold text-base leading-tight tracking-wide text-white">ตำแซ่บ ซ.4</h2>
                             <p class="text-[11px] text-orange-100 font-light">รสเด็ด แซ่บนัว ส่งตรงถึงโต๊ะคุณ</p>
                         </div>
                     </div>
                     
                     <div class="flex items-center gap-2">
-                        <select id="client-table-select" onchange="handleClientTableChange()" class="bg-black/20 hover:bg-black/30 text-white font-bold text-xs py-2 px-2.5 rounded-xl border border-white/20 focus:outline-none cursor-pointer">
+                        <select id="client-table-select" onchange="handleClientTableChange()" class="bg-black/30 hover:bg-black/40 text-white font-bold text-xs py-2 px-2.5 rounded-xl border border-white/20 focus:outline-none cursor-pointer">
                             <option value="101">โต๊ะ 101</option>
                             <option value="102" selected>โต๊ะ 102</option>
                             <option value="103">โต๊ะ 103</option>
@@ -47,7 +46,8 @@
                             <option value="Takeaway">🥡 กลับบ้าน</option>
                             <option value="Delivery">🛵 เดลิเวอรี่</option>
                         </select>
-                        <button onclick="openLoginModal()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm shadow-sm">🔑</button>
+                        <!-- ปุ่มเข้าหลังบ้านสีส้มสว่างเด่นชัด ไม่จมหาย -->
+                        <button onclick="openLoginModal()" class="w-8 h-8 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-slate-900 flex items-center justify-center text-sm shadow-md font-bold transition-all" title="เข้าสู่ระบบหลังบ้าน">🔑</button>
                     </div>
                 </div>
                 
@@ -61,7 +61,7 @@
             </div>
 
             <!-- PRODUCT DISPLAY AREA -->
-            <div class="flex-1 overflow-y-auto p-4 bg-slate-50" id="client-view-content">
+            <div class="flex-1 overflow-y-auto p-4 bg-slate-50 relative z-10" id="client-view-content">
                 <div id="client-menu-subtab">
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-2" id="client-categories-list"></div>
                     <div class="grid grid-cols-2 gap-3" id="client-food-grid">
@@ -79,7 +79,7 @@
             </div>
 
             <!-- CART FLOAT SUMMARY -->
-            <div id="client-floating-cart-bar" class="bg-white border-t border-slate-150 p-4 flex items-center justify-between shadow-2xl relative z-10">
+            <div id="client-floating-cart-bar" class="bg-white border-t border-slate-150 p-4 flex items-center justify-between shadow-2xl relative z-20">
                 <div>
                     <p class="text-xs text-slate-400">รายการในตะกร้า</p>
                     <p class="text-base font-black text-orange-600"><span id="cart-item-count">0</span> อย่าง | ฿<span id="cart-total-price">0</span></p>
@@ -148,7 +148,7 @@
     <div id="customize-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden flex flex-col">
             <div id="modal-banner-container" class="h-40 bg-gradient-to-r from-orange-600 to-red-600 flex items-end p-5 text-white relative bg-cover bg-center">
-                <div id="modal-banner-overlay" class="absolute inset-0 bg-black/40 z-10"></div>
+                <div class="absolute inset-0 bg-black/40 z-10"></div>
                 <div class="z-20 relative flex items-center gap-3">
                     <div id="modal-food-icon" class="text-2xl bg-white/25 w-10 h-10 rounded-xl flex items-center justify-center">🌶️</div>
                     <div><h3 id="modal-food-name" class="font-extrabold text-sm">ชื่ออาหาร</h3><p id="modal-food-price" class="text-xs text-orange-200 font-bold">฿0</p></div>
@@ -431,7 +431,6 @@
             document.getElementById('cart-total-price').innerText = p;
         }
 
-        // FIX HANG: ปรับปรุงฟังก์ชันเรนเดอร์สแกนสินค้าในตะกร้าไม่ให้ระบบพังชะงักตัวค้าง
         function openCartModal() {
             if(cart.length === 0) { showToast("ยังไม่ได้เลือกอาหารเลยครับ", "⚠️"); return; }
             document.getElementById('cart-table-badge').innerText = currentClientTable;
@@ -511,7 +510,7 @@
 
                 return `
                     <div class="bg-white border rounded-xl p-3 space-y-2 shadow-xs">
-                        <div class="flex justify-between font-bold text-xs border-b pb-1"><span>#${o.order_id}</span><span class="bg-slate-900 text-white px-2 rounded">โต๊ะ ${o.table}</span></div>
+                        <div class="flex justify-between font-bold text-xs border-b pb-1"><span>#${o.order_id}</span><span class="bg-slate-950 text-white px-2 rounded">โต๊ะ ${o.table}</span></div>
                         <ul>${rows}</ul>
                         <div class="pt-1">${btn}</div>
                     </div>
@@ -620,6 +619,7 @@
         function logoutStaff() { document.getElementById('staff-view-section').classList.add('hidden'); document.getElementById('customer-view-section').classList.remove('hidden'); }
         function handleClientTableChange() { currentClientTable = document.getElementById('client-table-select').value; document.getElementById('table-track-name').innerText = "โต๊ะ " + currentClientTable; renderAll(); }
         function updateUnpaidBadge() { const hasUnpaid = localOrders.some(o => o.table === currentClientTable && o.status !== 'paid'); document.getElementById('unpaid-order-badge').classList.toggle('hidden', !hasUnpaid); }
+        
         function switchClientTab(tab) {
             activeClientTab = tab;
             document.getElementById('client-menu-subtab').classList.toggle('hidden', tab !== 'menu');
@@ -628,12 +628,19 @@
             if(tab === 'track') {
                 const container = document.getElementById('client-tracking-list');
                 const activeOrders = localOrders.filter(o => o.table === currentClientTable && o.status !== 'paid');
-                container.innerHTML = activeOrders.map(o => `<div class="bg-white p-3 border rounded-xl text-xs flex justify-between"><span>ออเดอร์ #${o.order_id}</span><b class="text-orange-600">${o.status}</b></div>`).join('');
+                container.innerHTML = activeOrders.map(o => {
+                    let stateText = '⏳ รับออเดอร์แล้ว', stateColor = 'bg-amber-100 text-amber-800';
+                    if (o.status === 'cooking') { stateText = '🍳 กำลังปรุง'; stateColor = 'bg-orange-100 text-orange-800 animate-pulse'; }
+                    else if (o.status === 'ready') { stateText = '🟢 พร้อมเสิร์ฟ'; stateColor = 'bg-green-100 text-green-800'; }
+                    else if (o.status === 'served') { stateText = '✅ เสิร์ฟแล้ว'; stateColor = 'bg-blue-100 text-blue-800'; }
+                    return `<div class="bg-white p-3 border rounded-xl text-xs flex justify-between items-center shadow-xs"><span>ออเดอร์ #${o.order_id}</span><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${stateColor}">${stateText}</span></div>`;
+                }).join('');
             }
         }
         function closeOrderSuccessModal() { document.getElementById('order-success-modal').classList.add('hidden'); }
         function showToast(txt, icon="🌶️") { const toast = document.getElementById('toast-message'); document.getElementById('toast-icon').innerText = icon; document.getElementById('toast-text').innerText = txt; toast.classList.remove('hidden'); setTimeout(() => toast.classList.add('hidden'), 2500); }
         function manualSync() { syncWithGoogleSheet(); showToast("ซิงค์ข้อมูลสำเร็จ", "🔄"); }
+        function getFallbackIcon(cat, name) { const n = String(name || ''); if (n.includes('ไก่')) return '🍗'; if (n.includes('หมู')) return '🐷'; if (n.includes('น้ำ') || n.includes('เครื่องดื่ม')) return '🥤'; return '🌶️'; }
     </script>
 </body>
 </html>
