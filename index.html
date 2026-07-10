@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ตำแซ่บ ซ.4 - ระบบจัดการร้านอาหารออนไลน์</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans Thai & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans Thai', 'Inter', sans-serif; }
@@ -18,8 +20,10 @@
 
     <div id="app-wrapper" class="max-w-7xl mx-auto p-2 md:p-6">
         
+        <!-- ==================== 📱 CUSTOMER INTERFACE (หน้าฝั่งลูกค้า) ==================== -->
         <div id="customer-view-section" class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col h-[820px] relative">
             
+            <!-- FIXED BRAND HEADER -->
             <div class="bg-gradient-to-br from-orange-600 to-red-600 p-5 text-white shadow-lg relative block z-30">
                 <div class="flex justify-between items-center w-full">
                     <div class="flex items-center gap-3">
@@ -55,6 +59,7 @@
                 </div>
             </div>
 
+            <!-- PRODUCT DISPLAY AREA -->
             <div class="flex-1 overflow-y-auto p-4 bg-slate-50 relative z-10" id="client-view-content">
                 <div id="client-menu-subtab">
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-2" id="client-categories-list"></div>
@@ -72,6 +77,7 @@
                 </div>
             </div>
 
+            <!-- CART FLOAT SUMMARY -->
             <div id="client-floating-cart-bar" class="bg-white border-t border-slate-150 p-4 flex items-center justify-between shadow-2xl relative z-20">
                 <div>
                     <p class="text-xs text-slate-400">รายการในตะกร้า</p>
@@ -81,6 +87,7 @@
             </div>
         </div>
 
+        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE (หน้าหลังบ้านพนักงาน) ==================== -->
         <div id="staff-view-section" class="hidden space-y-6 animate-fade-in">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -94,6 +101,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- CASHIER & TABLES MAP -->
                 <div class="lg:col-span-5 space-y-6">
                     <div class="bg-white rounded-3xl p-5 border shadow-lg">
                         <h2 class="text-sm font-bold text-slate-900 mb-3">🖥️ สถานะโต๊ะและปุ่มเรียกเก็บเงิน (แคชเชียร์)</h2>
@@ -106,6 +114,7 @@
                     </div>
                 </div>
 
+                <!-- KITCHEN INCOMING QUEUE -->
                 <div class="lg:col-span-7 bg-white rounded-3xl p-5 border shadow-lg flex flex-col min-h-[500px]">
                     <div class="flex justify-between items-center pb-3 border-b mb-4">
                         <h2 class="text-sm font-bold text-slate-900">🍳 รายการสั่งอาหารรอทำในครัว</h2>
@@ -122,6 +131,8 @@
 
     </div>
 
+    <!-- DIALOG MODALS -->
+    <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4">
             <h3 class="font-extrabold text-base text-center">🔐 เข้าสู่ระบบหลังบ้าน</h3>
@@ -131,6 +142,7 @@
         </div>
     </div>
 
+    <!-- CUSTOMIZE MODAL -->
     <div id="customize-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden flex flex-col">
             <div id="modal-banner-container" class="h-40 bg-gradient-to-r from-orange-600 to-red-600 flex items-end p-5 text-white relative bg-cover bg-center">
@@ -170,6 +182,7 @@
         </div>
     </div>
 
+    <!-- CLIENT BASKET CART MODAL -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold text-xs flex justify-between items-center">
@@ -188,6 +201,7 @@
         </div>
     </div>
 
+    <!-- CASHIER BILLING MODAL -->
     <div id="billing-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
             <div class="p-4 bg-slate-900 text-white flex justify-between items-center font-bold text-xs">
@@ -233,6 +247,7 @@
         </div>
     </div>
 
+    <!-- CLIENT SUCCESS ANIMATION MODAL -->
     <div id="order-success-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4">
             <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mx-auto">✓</div>
@@ -242,10 +257,12 @@
         </div>
     </div>
 
+    <!-- TOAST NOTIFIER -->
     <div id="toast-message" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 text-white text-xs py-2.5 px-5 rounded-full shadow-2xl z-50 flex items-center gap-2">
         <span id="toast-icon">🌶️</span> <span id="toast-text">ข้อความ...</span>
     </div>
 
+    <!-- CORE LOGIC ARCHITECTURE -->
     <script>
         let IS_SIMULATION = false; 
         const API_URL = "https://script.google.com/macros/s/AKfycbwT_Eosuo1w7RSbqRe6xqkteXgh3HJ15frfUXldmfeMKB1ToRgBrYXFi3ub2G0eIsb-dw/exec";
@@ -318,6 +335,7 @@
             renderCashierGrid();
             renderAdminInventoryList();
             updateUnpaidBadge();
+            if (activeClientTab === 'track') renderClientTrackingList();
         }
 
         function renderClientCategories() {
@@ -472,6 +490,7 @@
         function renderKitchenDashboard() {
             const container = document.getElementById('kitchen-queue-container');
             if(!container) return;
+            // กรองเฉพาะออเดอร์ที่ยังมีสถานะดำเนินอยู่ ไม่ใช่ 'paid' หรือ 'cancelled' หรือ 'served' เพื่อเคลียร์ครัว
             const kitchenOrders = localOrders.filter(o => o.status === 'new' || o.status === 'cooking' || o.status === 'ready');
             document.getElementById('kitchen-count-badge').innerText = kitchenOrders.length;
             
@@ -487,16 +506,16 @@
 
                 let btn = '';
                 if(o.status === 'new') {
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking', this)" class="kitchen-act-btn w-full bg-orange-600 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">👨‍🍳 เริ่มปรุง</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'cooking', this)" class="w-full bg-orange-600 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">👨‍🍳 เริ่มปรุง</button>`;
                 } else if(o.status === 'cooking') {
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready', this)" class="kitchen-act-btn w-full bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🔔 พร้อมเสิร์ฟ</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'ready', this)" class="w-full bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🔔 พร้อมเสิร์ฟ</button>`;
                 } else {
-                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'served', this)" class="kitchen-act-btn w-full bg-slate-800 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🍽 เสิร์ฟแล้ว</button>`;
+                    btn = `<button onclick="updateOrderStatus('${o.order_id}', 'served', this)" class="w-full bg-slate-800 text-white py-1.5 rounded-lg text-xs font-bold shadow-xs">🍽 เสิร์ฟแล้ว</button>`;
                 }
 
                 return `
                     <div class="bg-white border rounded-xl p-3 space-y-2 shadow-xs">
-                        <div class="flex justify-between font-bold text-xs border-b pb-1"><span>#${o.order_id}</span><span class="bg-slate-900 text-white px-2 rounded">โต๊ะ ${o.table}</span></div>
+                        <div class="flex justify-between font-bold text-xs border-b pb-1"><span>#${o.order_id}</span><span class="bg-slate-950 text-white px-2 rounded">โต๊ะ ${o.table}</span></div>
                         <ul>${rows}</ul>
                         <div class="pt-1">${btn}</div>
                     </div>
@@ -504,28 +523,27 @@
             }).join('');
         }
 
-        // FIX: แก้ไขปุ่มในครัวค้างอัปเดต โดยให้สลับการทำงานทันทีและยิงเบื้องหลังโดยไม่ต้องรอ Callback (Optimistic Update)
+        // FIX: ซ่อมแซมปุ่มเริ่มปรุงค้าง โดยให้เปลี่ยนสถานะในหน่วยความจำทันที ไม่รอคิวเครือข่ายล็อกบราวเซอร์
         function updateOrderStatus(orderId, status, buttonEl) {
             if(buttonEl) { 
                 buttonEl.disabled = true; 
                 buttonEl.innerText = "⏳ บันทึกข้อมูล..."; 
             }
             
-            // อัปเดตข้อมูลในหน่วยความจำทันทีเพื่อให้หน้าจอเปลี่ยนสถานะโดยไม่ค้าง
+            // เปลี่ยนค่าสถานะหน้าเว็บบรรทัดนี้ทันทีเพื่อย้ายการ์ดโดยไม่มีอาการค้าง
             localOrders.forEach((o, i) => { 
                 if(String(o.order_id) === String(orderId)) localOrders[i].status = status; 
             }); 
             renderAll();
             
-            // ส่งข้อมูลไปยังชีทแบบ Background Async
             fetch(API_URL, { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) 
             }).then(() => {
-                setTimeout(() => { syncWithGoogleSheet(); }, 500);
+                setTimeout(() => { syncWithGoogleSheet(); }, 400);
             }).catch(e => {
-                console.log("Network dynamic delayed.");
+                console.log("Spreadsheet deferred refresh.");
             });
         }
 
@@ -535,14 +553,15 @@
             const tableList = ["101", "102", "103", "104", "105", "Takeaway", "Delivery"];
             
             container.innerHTML = tableList.map(t => {
+                // กรองออเดอร์รายโต๊ะที่ค้างชำระ โดยรองรับทั้งคอลัมน์ totalPrice และ คอลัมน์ total จากสคริปต์
                 const active = localOrders.filter(o => String(o.table) === t && o.status !== 'paid' && o.status !== 'cancelled');
                 let sum = 0; 
                 active.forEach(o => sum += parseFloat(o.totalPrice || o.total || 0));
-                let isEating = active.length > 0;
+                let isEating = active.length > 0 && sum > 0;
 
                 return `
                     <button onclick="openBillingModal('${t}')" class="border rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all ${isEating ? 'bg-orange-50 border-orange-300 font-bold text-orange-950' : 'bg-white text-slate-800 border-slate-200'}">
-                        <span class="text-xs">${t.startsWith('1') ? 'โต๊ะ '+t : t}</span>
+                        <span class="text-xs">โต๊ะ ${t === "Takeaway" ? "🥡 กลับบ้าน" : (t === "Delivery" ? "🛵 ส่งนอก" : t)}</span>
                         <span class="text-[10px] mt-1 ${isEating ? 'text-orange-600 font-bold' : 'text-slate-400'}">${isEating ? '฿'+sum : 'ว่าง'}</span>
                     </button>
                 `;
@@ -589,7 +608,7 @@
             document.getElementById('qr-payment-panel').classList.toggle('hidden', m !== 'qr');
         }
 
-        // FIX: แก้ไขปุ่มบันทึกชำระเงินค้างและโต๊ะไม่เคลียร์ โดยการล้างข้อมูลหน้าบ้านทันทีและปิดโมดอลทันที (Instant Vacancy Sync)
+        // FIXED COMPLETE CLEAR: ล้างข้อมูลอาเรย์โต๊ะที่ปิดบิลออกจากหน่วยความจำเบราว์เซอร์ทันที หน้าติดตามสถานะลูกค้าและแคชเชียร์จะว่างทันที 100%
         function payOffTableBill() {
             if (!activeTableForBill) return;
             const table = activeTableForBill;
@@ -601,24 +620,22 @@
                 if (rec < total) { alert("กรุณารับเงินสดมาให้ครบถ้วนเพื่อปิดบิลครับ"); return; }
             }
 
-            // สั่งล้างข้อมูลรายโต๊ะในหน้าเว็บทันที โต๊ะจะกลับเป็น "ว่าง" ทันทีโดยไม่ค้างหน้าจอ
+            // ทำลายค่าออเดอร์ของโต๊ะนี้ออกจากอาเรย์ภายในเว็บหน้าร้านและหลังบ้านทันที เพื่อรีเซ็ตสถานะเป็น "ว่าง"
             localOrders = localOrders.filter(o => String(o.table) !== String(table));
             localStorage.setItem('cached_orders', JSON.stringify(localOrders));
             
-            // ปิดหน้าต่างโมดอลและแจ้งเตือนทันที ป้องกันอาการค้างหน้าจอเดิม
             closeBillingModal(); 
             renderAll(); 
-            showToast(`💰 เคลียร์บิล โต๊ะ ${table} สำเร็จ!`, "🟢");
+            showToast(`💰 เคลียร์บิล โต๊ะ ${table} และออเดอร์ค้างสำเร็จ!`, "🟢");
 
-            // ยิงคำสั่งปิดบิลไปที่ Google ชีทแบบเบื้องหลัง
             fetch(API_URL, { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify({ action: "billTable", table: table }) 
             }).then(() => {
-                setTimeout(() => { syncWithGoogleSheet(); }, 500);
+                setTimeout(() => { syncWithGoogleSheet(); }, 600);
             }).catch(e => {
-                console.error("Background spreadsheet update deferred.");
+                console.error("Spreadsheet wipe loop executed.");
             });
         }
 
@@ -666,26 +683,39 @@
         function handleClientTableChange() { currentClientTable = document.getElementById('client-table-select').value; document.getElementById('table-track-name').innerText = "โต๊ะ " + currentClientTable; renderAll(); }
         function updateUnpaidBadge() { const hasUnpaid = localOrders.some(o => String(o.table) === currentClientTable && o.status !== 'paid'); document.getElementById('unpaid-order-badge').classList.toggle('hidden', !hasUnpaid); }
         
+        // RE-ENGINEERED TRACKING: แก้ไขลอจิกหน้าติดตามสถานะฝั่งลูกค้าให้อัปเดตและเคลียร์สถานะออเดอร์ทันทีตามสถานะในครัว
+        function renderClientTrackingList() {
+            const container = document.getElementById('client-tracking-list');
+            if(!container) return;
+            const activeOrders = localOrders.filter(o => String(o.table) === String(currentClientTable) && o.status !== 'paid' && o.status !== 'cancelled');
+            
+            if (activeOrders.length === 0) {
+                container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border text-slate-400 text-xs">🍽 ยังไม่มีรายการอาหารค้างเสิร์ฟสำหรับโต๊ะนี้ครับ</div>`;
+                return;
+            }
+            
+            container.innerHTML = activeOrders.map(o => {
+                let stateText = '⏳ รับออเดอร์แล้ว', stateColor = 'bg-amber-100 text-amber-800';
+                if (o.status === 'cooking') { stateText = '🍳 กำลังปรุง'; stateColor = 'bg-orange-100 text-orange-800 animate-pulse'; }
+                else if (o.status === 'ready') { stateText = '🟢 พร้อมเสิร์ฟ'; stateColor = 'bg-green-100 text-green-800'; }
+                else if (o.status === 'served') { stateText = '✅ เสิร์ฟแล้ว'; stateColor = 'bg-blue-100 text-blue-800'; }
+                return `<div class="bg-white p-3 border rounded-xl text-xs flex justify-between items-center shadow-xs"><span>ออเดอร์ #${o.order_id}</span><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${stateColor}">${stateText}</span></div>`;
+            }).join('');
+        }
+
         function switchClientTab(tab) {
             activeClientTab = tab;
             document.getElementById('client-menu-subtab').classList.toggle('hidden', tab !== 'menu');
             document.getElementById('client-track-subtab').classList.toggle('hidden', tab !== 'track');
             document.getElementById('client-floating-cart-bar').classList.toggle('hidden', tab !== 'menu');
             if(tab === 'track') {
-                const container = document.getElementById('client-tracking-list');
-                const activeOrders = localOrders.filter(o => String(o.table) === currentClientTable && o.status !== 'paid');
-                container.innerHTML = activeOrders.map(o => {
-                    let stateText = '⏳ รับออเดอร์แล้ว', stateColor = 'bg-amber-100 text-amber-800';
-                    if (o.status === 'cooking') { stateText = '🍳 กำลังปรุง'; stateColor = 'bg-orange-100 text-orange-800 animate-pulse'; }
-                    else if (o.status === 'ready') { stateText = '🟢 พร้อมเสิร์ฟ'; stateColor = 'bg-green-100 text-green-800'; }
-                    else if (o.status === 'served') { stateText = '✅ เสิร์ฟแล้ว'; stateColor = 'bg-blue-100 text-blue-800'; }
-                    return `<div class="bg-white p-3 border rounded-xl text-xs flex justify-between items-center shadow-xs"><span>ออเดอร์ #${o.order_id}</span><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${stateColor}">${stateText}</span></div>`;
-                }).join('');
+                renderClientTrackingList();
             }
         }
         function closeOrderSuccessModal() { document.getElementById('order-success-modal').classList.add('hidden'); }
         function showToast(txt, icon="🌶️") { const toast = document.getElementById('toast-message'); document.getElementById('toast-icon').innerText = icon; document.getElementById('toast-text').innerText = txt; toast.classList.remove('hidden'); setTimeout(() => toast.classList.add('hidden'), 2500); }
         function manualSync() { syncWithGoogleSheet(); showToast("ซิงค์ข้อมูลสำเร็จ", "🔄"); }
+        function getFallbackIcon(cat, name) { const n = String(name || ''); if (n.includes('ไก่')) return '🍗'; if (n.includes('หมู')) return '🐷'; if (n.includes('น้ำ') || n.includes('เครื่องดื่ม')) return '🥤'; return '🌶️'; }
     </script>
 </body>
 </html>
