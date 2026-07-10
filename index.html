@@ -23,7 +23,7 @@
         <!-- ==================== 📱 CUSTOMER INTERFACE (หน้าฝั่งลูกค้า) ==================== -->
         <div id="customer-view-section" class="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col h-[820px] relative">
             
-            <!-- FIXED BRAND HEADER (ซ่อมแซมส่วนหัวที่หายไปและล็อกปุ่มกุญแจ 🔑) -->
+            <!-- FIXED BRAND HEADER -->
             <div class="bg-gradient-to-br from-orange-600 to-red-600 p-5 text-white shadow-lg relative block z-30">
                 <div class="flex justify-between items-center w-full">
                     <div class="flex items-center gap-3">
@@ -46,8 +46,7 @@
                             <option value="Takeaway">🥡 กลับบ้าน</option>
                             <option value="Delivery">🛵 เดลิเวอรี่</option>
                         </select>
-                        <!-- ปุ่มเข้าหลังบ้านสีส้มสว่างเด่นชัด ไม่จมหาย -->
-                        <button onclick="openLoginModal()" class="w-8 h-8 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-slate-900 flex items-center justify-center text-sm shadow-md font-bold transition-all" title="เข้าสู่ระบบหลังบ้าน">🔑</button>
+                        <button onclick="openLoginModal()" class="w-8 h-8 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-slate-900 flex items-center justify-center text-sm shadow-md font-bold transition-all">🔑</button>
                     </div>
                 </div>
                 
@@ -88,7 +87,7 @@
             </div>
         </div>
 
-        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE ==================== -->
+        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE (หน้าหลังบ้านพนักงาน) ==================== -->
         <div id="staff-view-section" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -110,8 +109,8 @@
                     </div>
 
                     <div class="bg-white rounded-3xl p-5 border shadow-lg">
-                        <h2 class="text-sm font-bold text-slate-900 mb-2">🌶️ เปิด-ปิดเมนูสินค้าหมด</h2>
-                        <div class="max-h-[300px] overflow-y-auto space-y-2" id="admin-inventory-list"></div>
+                        <h2 class="text-sm font-bold text-slate-900 mb-2">🌶️ เปิด-ปิดเมนูสินค้าหมด (Real-time)</h2>
+                        <div class="max-h-[400px] overflow-y-auto space-y-2" id="admin-inventory-list"></div>
                     </div>
                 </div>
 
@@ -132,8 +131,7 @@
 
     </div>
 
-    <!-- ==================== DIALOG MODALS & POPUPS ==================== -->
-
+    <!-- DIALOG MODALS -->
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4">
@@ -518,26 +516,37 @@
             }).join('');
         }
 
+        // FIX BUTTON: ปลดล็อกปุ่มในครัวให้ตอบสนอง 100%
         async function updateOrderStatus(orderId, status) {
             try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) });
+                showToast("กำลังบันทึกคิว...", "⏳");
+                await fetch(API_URL, { 
+                    method: "POST", 
+                    mode: "no-cors", 
+                    body: JSON.stringify({ action: "updateOrderStatus", order_id: orderId, status: status }) 
+                });
+                showToast("อัปเดตสถานะครัวสำเร็จ", "🟢");
                 syncWithGoogleSheet();
-            } catch(e) {}
+            } catch(e) {
+                showToast("เชื่อมต่อระบบชีทขัดข้อง", "⚠️");
+            }
         }
 
+        // FIX MATRIX: แก้ไขตัวแปรอ้างอิงให้ดึงจาก totalPrice เพื่อให้แคชเชียร์สว่างเป็นสีส้มรายโต๊ะ
         function renderCashierGrid() {
             const container = document.getElementById('cashier-table-grid');
             if(!container) return;
             const tableList = ["101", "102", "103", "104", "105", "Takeaway", "Delivery"];
             container.innerHTML = tableList.map(t => {
-                const active = localOrders.filter(o => o.table === t && o.status !== 'paid' && o.status !== 'cancelled');
-                let sum = 0; active.forEach(o => sum += parseFloat(o.total || 0));
+                const active = localOrders.filter(o => String(o.table) === t && o.status !== 'paid' && o.status !== 'cancelled');
+                let sum = 0; 
+                active.forEach(o => sum += parseFloat(o.totalPrice || o.total || 0));
                 let isEating = active.length > 0;
 
                 return `
-                    <button onclick="openBillingModal('${t}')" class="border rounded-xl p-3 flex flex-col items-center justify-center text-center ${isEating ? 'bg-orange-50 border-orange-300 font-bold' : 'bg-white'}">
-                        <span class="text-xs">โต๊ะ ${t}</span>
-                        <span class="text-[10px] text-slate-400 mt-1">${isEating ? '฿'+sum : 'ว่าง'}</span>
+                    <button onclick="openBillingModal('${t}')" class="border rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all ${isEating ? 'bg-orange-50 border-orange-300 font-bold text-orange-950' : 'bg-white text-slate-800 border-slate-200'}">
+                        <span class="text-xs">โต๊ะ ${t === "Takeaway" ? "🥡 กลับบ้าน" : (t === "Delivery" ? "🛵 ส่งนอก" : t)}</span>
+                        <span class="text-[10px] mt-1 ${isEating ? 'text-orange-600 font-bold' : 'text-slate-400'}">${isEating ? '฿'+sum : 'ว่าง'}</span>
                     </button>
                 `;
             }).join('');
@@ -547,7 +556,7 @@
             activeTableForBill = table;
             document.getElementById('bill-table-title').innerText = table;
             
-            const activeOrders = localOrders.filter(o => o.table === table && o.status !== 'paid' && o.status !== 'cancelled');
+            const activeOrders = localOrders.filter(o => String(o.table) === table && o.status !== 'paid' && o.status !== 'cancelled');
             const tbody = document.getElementById('billing-items-rows');
             tbody.innerHTML = '';
             let grandTotal = 0;
@@ -584,41 +593,71 @@
         async function payOffTableBill() {
             if (!activeTableForBill) return;
             const table = activeTableForBill;
+            const btn = document.getElementById('cashier-confirm-pay-btn');
+            btn.disabled = true;
             closeBillingModal();
             showToast(`ปิดรอบโต๊ะ ${table} สำเร็จ`, "🟢");
             try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "billTable", table: table }) });
+                await fetch(API_URL, { 
+                    method: "POST", 
+                    mode: "no-cors", 
+                    body: JSON.stringify({ action: "billTable", table: table }) 
+                });
                 syncWithGoogleSheet();
             } catch(e) {}
+            finally {
+                btn.disabled = false;
+            }
         }
 
         function renderAdminInventoryList() {
             const container = document.getElementById('admin-inventory-list');
             if(!container) return;
-            container.innerHTML = localMenu.map(m => `
-                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg text-xs">
-                    <span>${m.name}</span>
-                    <button onclick="toggleItemStockStatus('${m.menu_id}', '${m.status === 'sold out' ? 'open' : 'sold out'}')" class="text-[10px] p-1 border rounded bg-white">
-                        ${m.status === 'sold out' ? '🔴 หมด' : '🟢 ขายอยู่'}
-                    </button>
-                </div>
-            `).join('');
+            if(localMenu.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-slate-400 py-2">กำลังโหลดรายการสต็อก...</p>`;
+                return;
+            }
+            container.innerHTML = localMenu.map(m => {
+                const isSold = m.status === 'sold out';
+                return `
+                    <div class="flex justify-between items-center bg-slate-50 border p-2.5 rounded-xl text-xs">
+                        <span class="font-medium text-slate-800">${m.name}</span>
+                        <button onclick="toggleItemStockStatus('${m.menu_id}', '${isSold ? 'open' : 'sold out'}')" class="text-[11px] font-bold px-3 py-1 rounded-lg border shadow-xs transition-all ${isSold ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}">
+                            ${isSold ? '🔴 ของหมด' : '🟢 ขายอยู่'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
         }
 
+        // FIX SWITCH: ซ่อมปุ่มสลับสถานะของหมดฝั่งแผงควบคุมหลังบ้าน
         async function toggleItemStockStatus(menuId, nextStatus) {
+            const targetIdx = localMenu.findIndex(m => m.menu_id === menuId);
+            if(targetIdx !== -1) {
+                localMenu[targetIdx].status = nextStatus;
+                renderAdminInventoryList();
+            }
+            showToast("กำลังส่งคำสั่งเปลี่ยนสต็อกสินค้า...", "⏳");
             try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateItemStatus", menu_id: menuId, status: nextStatus }) });
+                await fetch(API_URL, { 
+                    method: "POST", 
+                    mode: "no-cors", 
+                    body: JSON.stringify({ action: "updateItemStatus", menu_id: menuId, status: nextStatus }) 
+                });
+                showToast("เปลี่ยนสถานะสต็อกในชีทสำเร็จ", "🟢");
                 syncWithGoogleSheet();
-            } catch(e) {}
+            } catch(e) {
+                showToast("ระบบออฟไลน์ชั่วคราว", "⚠️");
+            }
         }
 
         function filterClientCategory(cat) { clientSelectedCategory = cat; renderAll(); }
-        function openLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
+        function openLoginModal() { document.getElementById('staff-password-input').value = ""; document.getElementById('login-modal').classList.remove('hidden'); }
         function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
-        function submitStaffLogin() { if(document.getElementById('staff-password-input').value === "zaq123") { closeLoginModal(); document.getElementById('customer-view-section').classList.add('hidden'); document.getElementById('staff-view-section').classList.remove('hidden'); } }
+        function submitStaffLogin() { if(document.getElementById('staff-password-input').value === "zaq123") { closeLoginModal(); document.getElementById('customer-view-section').classList.add('hidden'); document.getElementById('staff-view-section').classList.remove('hidden'); renderAll(); } }
         function logoutStaff() { document.getElementById('staff-view-section').classList.add('hidden'); document.getElementById('customer-view-section').classList.remove('hidden'); }
         function handleClientTableChange() { currentClientTable = document.getElementById('client-table-select').value; document.getElementById('table-track-name').innerText = "โต๊ะ " + currentClientTable; renderAll(); }
-        function updateUnpaidBadge() { const hasUnpaid = localOrders.some(o => o.table === currentClientTable && o.status !== 'paid'); document.getElementById('unpaid-order-badge').classList.toggle('hidden', !hasUnpaid); }
+        function updateUnpaidBadge() { const hasUnpaid = localOrders.some(o => String(o.table) === currentClientTable && o.status !== 'paid'); document.getElementById('unpaid-order-badge').classList.toggle('hidden', !hasUnpaid); }
         
         function switchClientTab(tab) {
             activeClientTab = tab;
@@ -627,7 +666,7 @@
             document.getElementById('client-floating-cart-bar').classList.toggle('hidden', tab !== 'menu');
             if(tab === 'track') {
                 const container = document.getElementById('client-tracking-list');
-                const activeOrders = localOrders.filter(o => o.table === currentClientTable && o.status !== 'paid');
+                const activeOrders = localOrders.filter(o => String(o.table) === currentClientTable && o.status !== 'paid');
                 container.innerHTML = activeOrders.map(o => {
                     let stateText = '⏳ รับออเดอร์แล้ว', stateColor = 'bg-amber-100 text-amber-800';
                     if (o.status === 'cooking') { stateText = '🍳 กำลังปรุง'; stateColor = 'bg-orange-100 text-orange-800 animate-pulse'; }
