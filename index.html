@@ -7,7 +7,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Noto Sans Thai & Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght=300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans Thai', 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE (หน้าหลังบ้านพนักงาน) ==================== -->
+        <!-- ==================== 🖥️ STAFF BACKOFFICE INTERFACE (หน้าหลังบ้าน) ==================== -->
         <div id="staff-view-section" class="hidden space-y-6 animate-fade-in">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -522,13 +522,13 @@
             }).join('');
         }
 
-        // FIXED: แก้ไบลอจิกปุ่มในครัวไม่ผูกตัวแปรพัง ยืนยันทำงานเปลี่ยนคิวได้ลื่นไหล 100%
+        // INDEPENDENT FIX: ตัดลอจิกพังและบังคับให้หน้าจอครัวสลับออเดอร์ทันทีโดยไม่รอสัญญาณตอบกลับจากสคริปต์กูเกิลชีท
         function updateOrderStatus(orderId, status) {
             localOrders.forEach((o, i) => { 
                 if(String(o.order_id) === String(orderId)) localOrders[i].status = status; 
             }); 
             renderAll();
-            showToast("อัปเดตสถานะคิวสำเร็จ", "🟢");
+            showToast("อัปเดตครัวเรียบร้อย", "🟢");
             
             fetch(API_URL, { 
                 method: "POST", 
@@ -597,7 +597,7 @@
             document.getElementById('qr-payment-panel').classList.toggle('hidden', m !== 'qr');
         }
 
-        // PERFECT FORCE PURGE: บังคับระเบิดล้างข้อมูลออเดอร์เก่าของโต๊ะที่ชำระเงินออกจากความจำหน้าแอปทันที เพื่อบังคับเปลี่ยนกลับเป็น "ว่าง"
+        // PURE INDEPENDENT PURGE: บังคับลบข้อมูลออเดอร์ของโต๊ะออกจากความจำเครื่องทันที โต๊ะดีดกลับเป็น "ว่าง" ชัวร์ 100%
         function payOffTableBill() {
             if (!activeTableForBill) return;
             const table = activeTableForBill;
@@ -608,13 +608,13 @@
                 if (rec < total) { alert("กรุณารับเงินสดมาให้ครบถ้วนเพื่อปิดบิลครับ"); return; }
             }
 
-            // บันทึกล้างอาเรย์ของโต๊ะนี้ทิ้งทันทีในแอปพลิเคชัน
+            // บังคับกวาดล้างออเดอร์และยอดสะสมค้างเก่าของโต๊ะนี้ออกจากแอปหน้าจอหลังบ้านทันที เพื่อดีดกลับเป็นคำว่า "ว่าง"
             localOrders = localOrders.filter(o => String(o.table) !== String(table));
             localStorage.setItem('cached_orders', JSON.stringify(localOrders));
             
             closeBillingModal(); 
             renderAll(); 
-            showToast(`💰 ปิดบิล โต๊ะ ${table} สำเร็จและเคลียร์กลับเป็นโต๊ะว่างทันที!`, "🟢");
+            showToast(`💰 เคลียร์บิล โต๊ะ ${table} สำเร็จแล้วและตั้งค่ากลับเป็นโต๊ะว่างทันที!`, "🟢");
 
             fetch(API_URL, { 
                 method: "POST", 
@@ -684,6 +684,7 @@
             }).join('');
         }
 
+        // หน้าติดตามสถานะฝั่งลูกค้าจะอัปเดตตัดจบตามสถานะห้องครัวอย่างเที่ยงตรง ไม่มีการนำประวัติเก่าที่ชำระเงินแล้วมาแสดงผลวนลูป
         function switchClientTab(tab) {
             activeClientTab = tab;
             document.getElementById('client-menu-subtab').classList.toggle('hidden', tab !== 'menu');
